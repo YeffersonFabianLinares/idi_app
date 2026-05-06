@@ -51,3 +51,13 @@ export const getDependencesStepFour = async (data: IDependencesStepFourParams) =
     const response = await api.get('get-dependences-stepFour', { params: data })
     return response.data
 }
+
+export const getAppoinmentsByPatient = async () => {
+    const response = await api.get('get-appoinments-by-patient')
+    return response.data
+}
+
+export const cancelAppoinment = async (data: any) => {
+    const response = await api.put('cancel-appoinment', data)
+    return response
+}

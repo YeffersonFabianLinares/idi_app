@@ -16,7 +16,7 @@ export const MenuCompany: Menu[] = [
         subtitle: 'Consulta y descarga tus exámenes médicos',
         icon: <AntDesign name="file-search" size={30} color="white" />,
         color: '',
-        link: '/company/results/Page'
+        link: '/company/appoinments/ShowAppoinments'
     },
     {
         id: 3,

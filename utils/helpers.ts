@@ -94,3 +94,18 @@ export const extractFieldByArray = (allValues: FieldValues, fieldNames: string[]
     );
     return data;
 }
+
+export const getStatusName = (status: string | undefined) => {
+    switch (status) {
+        case 'AN':
+            return 'CANCELADA'
+        case 'IN':
+            return 'CANCELADA'
+        case 'RA':
+            return 'REASIGNADAS'
+        case 'AC':
+            return 'ACTIVA'
+        default:
+            return ''
+    }
+}
