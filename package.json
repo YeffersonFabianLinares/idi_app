@@ -28,7 +28,7 @@
     "expo-web-browser": "~15.0.10",
     "laravel-echo": "^2.3.4",
     "lucide-react-native": "^1.14.0",
-    "pusher-js": "^8.5.0",
+    "pusher-js": "^7.4.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.75.0",
