@@ -4,6 +4,7 @@ import { RadioButton } from '@/components/form/RadioButton';
 import { LoadingModal } from '@/components/LoadingModal';
 import TitleApp from '@/components/TitleApp';
 import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
+import { UserLoggedInfo } from '@/interfaces/UserLoggedInfo';
 import { authSchema, AuthSchema } from '@/schemas/auth.schema';
 import { login } from '@/services/auth.service';
 import { globalStyles } from '@/styles/style';
@@ -84,6 +85,15 @@ export default function LoginScreen() {
                     localStorage.setItem('userToken', token)
                 } else {
                     await SecureStore.setItemAsync('userToken', token);
+                    const user = response.response?.user
+                    const userLoggedInfo: UserLoggedInfo = {
+                        id: user.ordinal,
+                        fec_nacido: user.fec_nacido,
+                        num_doc: user.num_doc,
+                        pri_nombre: user.pri_nombre,
+                        pri_apellido: user.pri_apellido
+                    }
+                    await SecureStore.setItemAsync('user', JSON.stringify(userLoggedInfo))
                 }
                 router.dismissAll()
                 router.push('/company/Home')

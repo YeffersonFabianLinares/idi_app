@@ -63,7 +63,7 @@ export const globalStyles = StyleSheet.create({
         borderColor: '#d1d5db',
     },
     circleActive: { backgroundColor: '#ff9900', borderColor: '#ff9900' },
-    radioText: { fontSize: 14, color: '#374151' },
+    radioText: { fontSize: 13, color: '#374151' },
     textArea: { height: 100, textAlignVertical: 'top', paddingTop: 12 },
     iconLeft: { marginRight: 0 },
     iconRight: { marginLeft: 10 },

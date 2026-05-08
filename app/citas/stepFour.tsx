@@ -1,8 +1,10 @@
 import Button from '@/components/form/Button';
 import { InputDate } from '@/components/form/InputDate';
+import { RadioButton } from '@/components/form/RadioButton';
 import { Select } from '@/components/form/Select';
 import { LoadingModal } from '@/components/LoadingModal';
 import { getDependencesStepFour, searchAppoinmentDisponibily } from '@/services/appoinment.service';
+import { globalStyles } from '@/styles/style';
 import { testPusherConnection } from '@/utils/echo';
 import { Calendar, Clock, MapPin } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
@@ -13,14 +15,6 @@ import Animated, { FadeInRight } from 'react-native-reanimated';
 interface StepFourProps {
     stepFields: string[]
     onFinish: () => void
-}
-
-interface Horario {
-    id: string
-    fecha: string
-    hora: string
-    sede: string
-    dir_sede: string
 }
 
 interface IDependences {
@@ -59,7 +53,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
             setLoading(false);
             setError('El servidor tardó demasiado en responder. Intenta de nuevo.');
         }
-    }, 45000);
+    }, 30000);
 
     const optionsBusqueda = [
         { id: '1', label: 'Buscar la primera cita disponible' },
@@ -98,7 +92,6 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                 }
                 setLoading(false)
                 const rawData = data.data
-                console.log('rawData ==> ', rawData);
 
                 if (rawData) {
                     const listadoCitas = Object.keys(rawData)
@@ -110,7 +103,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                                 fecha: rawData[`fec_dispo_${index}`],
                                 hora: rawData[`hor_dispo_${index}`],
                                 sede: rawData[`sed_dispo_${index}`],
-                                dir_sede: rawData[`sede${index}`]['direccion1']
+                                dir_sede: rawData[`sede${index}`]?.direccion1 ?? null
                             };
                         });
                     setHorarios(listadoCitas)
@@ -131,8 +124,6 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
     }, [])
 
     useEffect(() => {
-        console.log('here useEffect');
-
         const getDependencesFn = async () => {
             const response = await getDependencesStepFour({
                 cod_depto: getValues('cod_depto'),
@@ -159,12 +150,12 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
      * de consulta en las bases de datos de citas y emita la respuesta por el socket.
      */
     const onPress = async () => {
-        const isValid = await trigger(stepFields);
+        const allValues = getValues();
+        const fieldNames = [...stepFields, 'id_menbot', 'sede_dispo', 'hora_dispo'];
+
+        const isValid = await trigger(fieldNames);
 
         if (isValid) {
-            const allValues = getValues();
-            const fieldNames = [...stepFields, 'id_menbot'];
-
             // Creamos un objeto nuevo solo con las llaves permitidas
             const data = Object.fromEntries(
                 Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
@@ -176,8 +167,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
         }
     }
 
-    const hola = () => {
-        console.log('here');
+    const handleFinish = () => {
         setLoading(true)
         onFinish()
     }
@@ -189,7 +179,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
      *   con un borde y un indicador naranja.
      */
     return (
-        <Animated.View entering={FadeInRight} style={styles.container}>
+        <Animated.View entering={FadeInRight} style={globalStyles.container}>
             <View style={styles.scrollContent}>
                 {/* Card Informativo Superior */}
                 <View style={styles.infoCard}>
@@ -215,28 +205,28 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                         placeholder='Seleccione'
                     />
                 </View>
-                <View style={
-                    busqueda === '2' || busqueda === '4' ?
-                        { display: 'contents' } : { display: 'none' }}
-                >
-                    <Select
-                        label='Sedes'
-                        name='sede_dispo'
-                        options={dependences?.sedes || []}
-                        placeholder='Seleccione'
-                    />
-                </View>
-                <View style={
-                    busqueda === '3' || busqueda === '4' ?
-                        { display: 'contents' } : { display: 'none' }}
-                >
-                    <InputDate
-                        label='Fecha cita'
-                        name='fec_dispo'
-                        value={new Date()}
-                        minimumDate={new Date()}
-                    />
-                </View>
+                {
+                    (busqueda === '2' || busqueda === '4') &&
+                    <View>
+                        <Select
+                            label='Sedes'
+                            name='sede_dispo'
+                            options={dependences?.sedes || []}
+                            placeholder='Seleccione'
+                        />
+                    </View>
+                }
+                {
+                    (busqueda === '3' || busqueda === '4') &&
+                    <View>
+                        <InputDate
+                            label='Fecha cita'
+                            name='fec_dispo'
+                            value={new Date()}
+                            minimumDate={new Date()}
+                        />
+                    </View>
+                }
                 <View
                     style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', marginBottom: 15 }}>
                     <Button
@@ -296,19 +286,37 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                         style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', marginBottom: 15 }}>
                         <Button
                             title='Confirmar Cita'
-                            onPress={hola}
+                            onPress={handleFinish}
                         />
                     </View>
                 }
+
+                <View>
+                    <RadioButton
+                        label='Tu cita fue agendada exitosamente, a tu celular llegará la confirmación y a tu correo electrónico fue enviada la preparación y requisitos correspondientes.'
+                        name='sede_dispo'
+                        direction='column'
+                        options={[
+                            {
+                                label: 'Agendar otra cita de la misma especialidad para este usuario',
+                                value: '1'
+                            }, {
+                                label: 'Agendar una cita para otra especialidad',
+                                value: '2'
+                            }, {
+                                label: 'Salir',
+                                value: '3'
+                            }
+                        ]}
+                    />
+                </View>
             </View>
-        </Animated.View>
+        </Animated.View >
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F4F7F7' },
     scrollContent: { padding: 20 },
-
     // Estilos Card Informativo
     infoCard: {
         backgroundColor: 'white',

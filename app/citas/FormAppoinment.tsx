@@ -1,4 +1,5 @@
 import { LoadingModal } from '@/components/LoadingModal';
+import ModalConfirm from '@/components/ModalConfirm';
 import { StepProgressBar } from '@/components/StepProgressBar';
 import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
 import { IDependencesAppoinemnts } from '@/interfaces/IDependencesAppoinemnts';
@@ -11,7 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, View } from 'react-native';
 import StepFour from './stepFour';
 import StepOne from './stepOne';
 import StepThree from './stepThree';
@@ -44,6 +45,8 @@ const FormAppoinment = () => {
     const navigation = useNavigation();
     const [isSaved, SetIsSaved] = useState<boolean>(false)
     const headerHeight = useHeaderHeight();
+    const [pendingAction, setPendingAction] = useState<any>(null);
+    const [isVisible, setModalVisible] = useState(false);
 
     /** 
      * Mapeo de campos por paso para validación parcial.
@@ -101,6 +104,13 @@ const FormAppoinment = () => {
         }
     }
 
+    const handleConfirmExit = () => {
+        setModalVisible(false);
+        if (pendingAction) {
+            navigation.dispatch(pendingAction);
+        }
+    };
+
     useEffect(() => {
         const dependencesAppoinmentsFn = async () => {
             try {
@@ -130,25 +140,15 @@ const FormAppoinment = () => {
                 if (isSaved) return;
 
                 e.preventDefault();
-                Alert.alert(
-                    'Confirmación',
-                    '¿Estás seguro de que quieres salir?',
-                    [
-                        { text: 'Cancelar', style: 'cancel', onPress: () => { } },
-                        {
-                            text: 'Salir',
-                            style: 'destructive',
-                            onPress: () => navigation.dispatch(e.data.action),
-                        },
-                    ]
-                );
+                setPendingAction(e.data.action);
+                setModalVisible(true);
             };
 
             // Escuchar el evento de navegación
             const unsubscribe = navigation.addListener('beforeRemove', onBeforeRemove);
 
             return () => unsubscribe();
-        }, [navigation])
+        }, [navigation, isSaved])
     );
 
     /**
@@ -167,6 +167,12 @@ const FormAppoinment = () => {
             }
             <FormProvider {...methods}>
                 <LoadingModal visible={isLoading} />
+                <ModalConfirm
+                    isVisible={isVisible}
+                    onClose={() => setModalVisible(false)}
+                    onConfirm={() => handleConfirmExit()}
+                    title='Confirmación'
+                    message='¿Estás seguro de que quieres salir?' />
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={headerHeight + 20}>
                     <LoadingModal visible={loading} />
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -186,7 +192,8 @@ const FormAppoinment = () => {
                                 <StepTwo onNext={handleNext} stepFields={fieldsByStep[2]} setLoading={setLoading} />
                             </View>
                             <View style={currentStep === 3 ? { display: 'contents' } : { display: 'none' }}>
-                                <StepThree dependences={dependences} stepFields={fieldsByStep[3]} onNext={handleNext} type={type} />
+                                <StepThree dependences={dependences} stepFields={fieldsByStep[3]} onNext={handleNext} type={type}
+                                setLoading={setLoading} />
                             </View>
                             {
                                 currentStep === 4 &&

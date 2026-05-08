@@ -11,6 +11,7 @@ interface Props {
     options: Option[]
     placeholder?: string;
     required?: boolean
+    showEmptyOption?: boolean
 }
 
 interface Option {
@@ -18,7 +19,7 @@ interface Option {
     label: string;
 }
 
-export const Select = ({ name, label, options, placeholder, required = true }: Props) => {
+export const Select = ({ name, label, options, placeholder, required = true, showEmptyOption = true }: Props) => {
     const { control, formState: { errors } } = useFormContext();
     const [isOpen, setIsOpen] = useState(false);
     const error = errors[name];
@@ -47,6 +48,19 @@ export const Select = ({ name, label, options, placeholder, required = true }: P
 
                         {isOpen && (
                             <View style={styles.dropdown}>
+                                {
+                                    showEmptyOption &&
+                                    <TouchableOpacity
+                                        style={styles.option}
+                                        onPress={() => {
+                                            onChange(null); // Limpia el valor
+                                            setIsOpen(false);
+                                        }}>
+                                        <Text style={[styles.optionText, { color: '#94a3b8', fontStyle: 'italic' }]}>
+                                            -- Seleccione --
+                                        </Text>
+                                    </TouchableOpacity>
+                                }
                                 {options.map((item) => (
                                     <TouchableOpacity
                                         key={item.id}

@@ -1,6 +1,7 @@
 import Button from '@/components/form/Button';
 import { Input } from '@/components/form/Input';
 import { Select } from '@/components/form/Select';
+import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
 import { IDependencesAppoinemnts } from '@/interfaces/IDependencesAppoinemnts';
 import { initAppoinment } from '@/services/appoinment.service';
 import { globalStyles } from '@/styles/style';
@@ -8,6 +9,7 @@ import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 
 interface StepOneProps {
     dependences: IDependencesAppoinemnts;
@@ -37,7 +39,8 @@ const StepOne = ({ dependences, setLoading, onNext, stepFields }: StepOneProps) 
      * Acceso al contexto del formulario compartido (FormProvider).
      * Permite leer y setear valores de forma global en el Wizard.
      */
-    const { getValues, setValue, reset } = useFormContext()
+    const { getValues, setValue, reset, trigger } = useFormContext()
+    const { execute } = useAsyncFormHandler()
 
     /**
      * Procesa el inicio de la cita.
@@ -50,31 +53,44 @@ const StepOne = ({ dependences, setLoading, onNext, stepFields }: StepOneProps) 
      * 4. Al finalizar, invoca 'onNext' para avanzar al Paso 2.
      */
     const handlePress = async () => {
-        setLoading(true)
-
         const allValues = getValues();
         const fieldNames = [...stepFields, 'id_menbot'];
 
-        // Creamos un objeto nuevo solo con las llaves permitidas
-        const data = Object.fromEntries(
-            Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
-        );
+        const isValid = await trigger(stepFields);
 
-        const response = await initAppoinment(data)
-        if (response.status == 200) {
-            Object.keys(response.data).forEach((key) => {
-                // @ts-ignore
-                let value = response.data[key];
+        if (isValid) {
+            // Creamos un objeto nuevo solo con las llaves permitidas
+            const data = Object.fromEntries(
+                Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
+            );
+            setLoading(true)
+            const response = await execute(
+                () => initAppoinment(data)
+            )
+            if (response.alertSeverity === 'success') {
+                if (response?.response?.data) {
+                    const dataResponse = response.response.data
+                    Object.keys(dataResponse).forEach((key) => {
+                        // @ts-ignore
+                        let value = dataResponse[key];
 
-                if (key === 'fec_nacido' && typeof value === 'string') {
-                    value = new Date(value.replace(' ', 'T')); // El 'T' es para asegurar compatibilidad ISO
+                        if (key === 'fec_nacido' && typeof value === 'string') {
+                            value = new Date(value.replace(' ', 'T')); // El 'T' es para asegurar compatibilidad ISO
+                        }
+
+                        setValue(key, value, { shouldValidate: true });
+                    });
+                    onNext()
                 }
-
-                setValue(key, value, { shouldValidate: true });
-            });
+            } else {
+                Toast.show({
+                    type: response.alertSeverity,
+                    text1: 'Idime',
+                    text2: response.message
+                })
+            }
+            setLoading(false)
         }
-        setLoading(false)
-        onNext()
     }
 
     /**

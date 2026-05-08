@@ -1,13 +1,11 @@
 // @ts-ignore
-import logoImgDiagnostico from '@/assets/images/main-header.webp';
-import Logout from '@/components/Logout';
 import { MenuCompany } from '@/components/MenuCompany';
 import MenuGeneral from '@/components/MenuGeneral';
-import TitleApp from '@/components/TitleApp';
+import PatientCardInfo from '@/components/PatientCardInfo';
 import { Menu } from '@/interfaces/Menu';
 import { globalStyles } from '@/styles/style';
 import React from 'react';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 export default function ServiciosPortal() {
 
@@ -17,18 +15,8 @@ export default function ServiciosPortal() {
         <View style={globalStyles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.header}>
-                    <TitleApp
-                        title1='Portal principal'
-                        title2='Pacientes' />
-                    <Logout />
                 </View>
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={logoImgDiagnostico}
-                        style={styles.mainImage}
-                        resizeMode="cover"
-                    />
-                </View>
+                <PatientCardInfo />
                 <MenuGeneral options={options} />
             </ScrollView>
         </View>

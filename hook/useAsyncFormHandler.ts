@@ -95,10 +95,11 @@ export const useAsyncFormHandler = () => {
             const axiosError = err as AxiosError;
 
             let finalErrorMessage = errorMessage || 'Ha ocurrido un error inesperado.';
-
+            
             if (axiosError.status) {
                 if (axiosError.status >= 500) {
-                    finalErrorMessage = 'Error interno del servidor. Inténtalo más tarde.';
+                    // @ts-ignore
+                    finalErrorMessage = axiosError?.response?.data?.message || 'Error interno del servidor. Inténtalo más tarde.';
                 } else if (axiosError.status >= 400 && axiosError.status < 500) {
 
                     if (axiosError.status == 422) {

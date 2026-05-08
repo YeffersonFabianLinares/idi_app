@@ -1,5 +1,7 @@
 import { LoadingModal } from '@/components/LoadingModal';
-import TitleApp from '@/components/TitleApp';
+import ModalConfirm from '@/components/ModalConfirm';
+import NoResult from '@/components/NoResult';
+import PatientCardInfo from '@/components/PatientCardInfo';
 import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
 import { cancelAppoinment, getAppoinmentsByPatient } from '@/services/appoinment.service';
 import { globalStyles } from '@/styles/style';
@@ -14,22 +16,32 @@ export default function ShowAppoinments() {
     const [appoinemnts, setAppoinments] = useState<any[]>([])
     const { execute, isLoading } = useAsyncFormHandler()
 
-    const handleCancelAppoinment = async (data: any) => {
-        const response = await execute(
-            () => cancelAppoinment(data)
-        )
-        Toast.show({
-            type: response.alertSeverity,
-            text1: 'Idime',
-            text2: response.message,
-            visibilityTime: 2000
-        })
-        getAppoinmentsByPatientFn()
-    }
+    const [isVisible, setModalVisible] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     const getAppoinmentsByPatientFn = async () => {
         const response = await getAppoinmentsByPatient()
         setAppoinments(response)
+    }
+
+    const handleCancelAppoinment = async (data: any) => {
+        setModalVisible(true)
+        setSelectedAppointment(data)
+    }
+
+    const onConfirm = async () => {
+        const response = await execute(
+            () => cancelAppoinment(selectedAppointment)
+        )
+
+        Toast.show({
+            type: response.alertSeverity,
+            text1: 'Idime',
+            text2: response.message,
+            visibilityTime: 1800
+        })
+        getAppoinmentsByPatientFn()
+        setModalVisible(false)
     }
 
     useEffect(() => {
@@ -40,53 +52,66 @@ export default function ShowAppoinments() {
         <View style={globalStyles.container}>
             <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                 <LoadingModal visible={isLoading} />
-                <TitleApp
-                    title1='Citas'
-                    title2='Asignadas'
+                <ModalConfirm
+                    isVisible={isVisible}
+                    onClose={() => setModalVisible(false)}
+                    onConfirm={onConfirm}
+                    title='¿Cancelar cita?'
+                    message='Esta acción liberará tu espacio y otros pacientes podrán tomarlo'
                 />
+
+                <PatientCardInfo />
                 {
-                    appoinemnts.map((item) => (
-                        <View style={styles.card}>
-                            <View style={styles.header}>
-                                <Text style={styles.titleText}>{item.examen.nombre}</Text>
-                                <View style={[styles.badge, { backgroundColor: item.estado === 'AC' ? '#E0F7F9' : '#F5F5F5' }]}>
-                                    <Text style={styles.badgeText}>{getStatusName(item.estado)}</Text>
-                                </View>
-                            </View>
+                    appoinemnts.length > 0 ?
+                        (
+                            <View>
+                                <Text style={styles.title_label}>CITAS DEL PACIENTE</Text>
+                                {appoinemnts.map((item, index) => (
+                                    <View style={styles.card} key={index}>
+                                        <View style={styles.header}>
+                                            <Text style={styles.titleText}>{item.examen.nombre}</Text>
+                                            <View style={[styles.badge, { backgroundColor: item.estado === 'AC' ? '#E0F7F9' : '#F5F5F5' }]}>
+                                                <Text style={styles.badgeText}>{getStatusName(item.estado)}</Text>
+                                            </View>
+                                        </View>
 
-                            <View style={styles.infoRow}>
-                                <View style={styles.infoItem}>
-                                    <MaterialCommunityIcons name="calendar-month-outline" size={24} color="#2D6A4F" />
-                                    <View style={styles.infoTextContainer}>
-                                        <Text style={styles.label}>FECHA Y HORA</Text>
-                                        <Text style={styles.value}>{item.fecha_cita}</Text>
-                                        <Text style={styles.value}>{item.hora_cita}</Text>
+                                        <View style={styles.infoRow}>
+                                            <View style={styles.infoItem}>
+                                                <MaterialCommunityIcons name="calendar-month-outline" size={24} color="#2D6A4F" />
+                                                <View style={styles.infoTextContainer}>
+                                                    <Text style={styles.label}>FECHA Y HORA</Text>
+                                                    <Text style={styles.value}>{item.fecha_cita}</Text>
+                                                    <Text style={styles.value}>{item.hora_cita}</Text>
+                                                </View>
+                                            </View>
+
+                                            <View style={styles.infoItem}>
+                                                <MaterialCommunityIcons name="map-marker-outline" size={24} color="#2D6A4F" />
+                                                <View style={styles.infoTextContainer}>
+                                                    <Text style={styles.label}>CLÍNICA | SEDE</Text>
+                                                    <Text style={styles.value}>{item.sede.nombre}</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+
+                                        {
+                                            item.estado === 'AC' && <>
+                                                <TouchableOpacity style={styles.linkContainer}>
+                                                    <MaterialCommunityIcons name="file-document-outline" size={18} color="#2D6A4F" />
+                                                    <Text style={styles.linkText}>Ver preparaciones</Text>
+                                                </TouchableOpacity>
+
+                                                <TouchableOpacity style={styles.cancelButton} onPress={() => handleCancelAppoinment({ ordinal: item.ordinal })}>
+                                                    <Text style={styles.cancelButtonText}>CANCELAR CITA</Text>
+                                                </TouchableOpacity>
+                                            </>
+                                        }
                                     </View>
-                                </View>
-
-                                <View style={styles.infoItem}>
-                                    <MaterialCommunityIcons name="map-marker-outline" size={24} color="#2D6A4F" />
-                                    <View style={styles.infoTextContainer}>
-                                        <Text style={styles.label}>CLÍNICA | SEDE</Text>
-                                        <Text style={styles.value}>{item.sede.nombre}</Text>
-                                    </View>
-                                </View>
+                                ))}
                             </View>
-
-                            {
-                                item.estado === 'AC' && <>
-                                    <TouchableOpacity style={styles.linkContainer}>
-                                        <MaterialCommunityIcons name="file-document-outline" size={18} color="#2D6A4F" />
-                                        <Text style={styles.linkText}>Ver preparaciones</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.cancelButton} onPress={() => handleCancelAppoinment({ ordinal: item.ordinal })}>
-                                        <Text style={styles.cancelButtonText}>CANCELAR CITA</Text>
-                                    </TouchableOpacity>
-                                </>
-                            }
-                        </View>
-                    ))
+                        )
+                        :
+                        <NoResult />
                 }
             </ScrollView>
         </View>
@@ -110,6 +135,7 @@ const styles = StyleSheet.create({
         borderColor: '#E9ECEF',
     },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
+    title_label: { fontSize: 15, color: '#64748B', fontWeight: 'bold', marginBottom: 15, marginTop: 10 },
     typeText: { fontSize: 12, color: '#6C757D', fontWeight: '600' },
     badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
     badgeText: { fontSize: 10, color: '#00A8A8', fontWeight: 'bold' },

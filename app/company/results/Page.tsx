@@ -1,8 +1,7 @@
 import { LoadingModal } from '@/components/LoadingModal';
-import Logout from '@/components/Logout';
+import PatientCardInfo from '@/components/PatientCardInfo';
 import { IResult } from '@/interfaces/IResult';
 import { downloadResultPdf, getDeliveryResults } from '@/services/deliveryResults.service';
-import { calcAge, formatNumber } from '@/utils/helpers';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Directory, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -127,29 +126,7 @@ const PatientDashboard = () => {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.content}>
-                <View style={styles.patientCard}>
-                    <View style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between'
-                    }}>
-                        <View>
-                            <Text style={styles.label}>EXPEDIENTE DEL PACIENTE</Text>
-                            <Text style={styles.patientName}>{dataApi?.paciente.pri_nombre} {dataApi?.paciente.pri_apellido}</Text>
-                        </View>
-                        <Logout />
-                    </View>
-                    <View style={styles.statsRow}>
-                        <View style={{ marginRight: 30 }}>
-                            <Text style={styles.statLabel}>CÉDULA</Text>
-                            <Text style={styles.statValue}>{formatNumber(dataApi?.paciente.num_doc)}</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.statLabel}>EDAD</Text>
-                            <Text style={styles.statValue}>{calcAge(dataApi?.paciente.fec_nacido)} Años</Text>
-                        </View>
-                    </View>
-                </View>
+                <PatientCardInfo />
 
                 <View>
                     <Text style={styles.title_label}>RESULTADOS DE EXÁMENES</Text>
@@ -249,22 +226,7 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F8FAFC' },
     avatarCircle: { width: 35, height: 35, borderRadius: 17, backgroundColor: '#444', justifyContent: 'center', alignItems: 'center' },
     content: { padding: 20 },
-    patientCard: {
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 25,
-        marginBottom: 20,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 10
-    },
     title_label: { fontSize: 15, color: '#64748B', fontWeight: 'bold', marginBottom: 15, marginTop: 10 },
-    label: { fontSize: 10, color: '#64748B', fontWeight: 'bold' },
-    patientName: { fontSize: 23, fontWeight: 'bold', marginVertical: 10 },
-    statsRow: { flexDirection: 'row', justifyContent: 'flex-start', marginVertical: 15 },
-    statLabel: { fontSize: 10, color: '#94A3B8' },
-    statValue: { fontSize: 13, fontWeight: 'bold', color: '#334155' },
     statusBadge: {
         backgroundColor: '#065F46',
         flexDirection: 'row',

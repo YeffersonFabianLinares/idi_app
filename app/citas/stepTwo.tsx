@@ -2,12 +2,14 @@ import Button from "@/components/form/Button";
 import { Input } from "@/components/form/Input";
 import { InputDate } from "@/components/form/InputDate";
 import { RadioButton } from "@/components/form/RadioButton";
+import { useAsyncFormHandler } from "@/hook/useAsyncFormHandler";
 import { updateFieldsStepTwo } from "@/services/appoinment.service";
 import { globalStyles } from "@/styles/style";
 import { Dispatch, SetStateAction } from "react";
 import { useFormContext } from "react-hook-form";
 import { View } from "react-native";
 import Animated, { FadeInRight } from "react-native-reanimated";
+import Toast from "react-native-toast-message";
 
 interface StepTwoProps {
     onNext: () => void;
@@ -32,7 +34,7 @@ interface StepTwoProps {
 const StepTwo = ({ onNext, stepFields, setLoading }: StepTwoProps) => {
 
     /** Acceso al estado global del formulario. */
-    const { getValues } = useFormContext()
+    const { getValues, trigger } = useFormContext()
 
     const optionsSex = [
         { label: 'Femenino', value: 'F' },
@@ -45,6 +47,13 @@ const StepTwo = ({ onNext, stepFields, setLoading }: StepTwoProps) => {
     }]
 
     /**
+        * Hook personalizado para manejar el envío asíncrono.
+        * @returns {execute} Función que envuelve la llamada a la API.
+        * @returns {isLoading} Estado de carga para el LoadingModal.
+    */
+    const { execute } = useAsyncFormHandler()
+
+    /**
      * Actualiza la información personal en el servidor.
      * 
      * 1. Extrae solo los valores pertenecientes a este paso más el identificador 'id_menbot'.
@@ -52,20 +61,30 @@ const StepTwo = ({ onNext, stepFields, setLoading }: StepTwoProps) => {
      * 3. Si el servidor responde exitosamente (200), permite avanzar al siguiente paso.
      */
     const handlePress = async () => {
-        setLoading(true)
-
         const allValues = getValues();
         const fieldNames = [...stepFields, 'id_menbot'];
 
-        // Creamos un objeto nuevo solo con las llaves permitidas
-        const data = Object.fromEntries(
-            Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
-        );
+        const isValid = await trigger(fieldNames);
 
-        const response = await updateFieldsStepTwo(data)
-        setLoading(false)
-        if (response.status == 200) {
-            onNext()
+        if (isValid) {
+            // Creamos un objeto nuevo solo con las llaves permitidas
+            const data = Object.fromEntries(
+                Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
+            );
+            setLoading(true)
+            const response = await execute(
+                () => updateFieldsStepTwo(data)
+            )
+            if (response.alertSeverity === 'success') {
+                onNext()
+            } else {
+                Toast.show({
+                    type: response.alertSeverity,
+                    text1: 'Idime',
+                    text2: response.message
+                })
+            }
+            setLoading(false)
         }
     }
 

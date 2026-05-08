@@ -1,105 +1,103 @@
-import { Modal, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import Modal from 'react-native-modal';
 import { View } from "./Themed";
 
-interface ConfirmModalProps {
-    visible: boolean;
-    // onClose: () => void;
-    // onConfirm: () => void;
+interface ModalConfirmProps {
+    isVisible: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title?: string;
+    message?: string;
 }
-
-const ModalConfirm = ({ visible }: ConfirmModalProps) => {
+const ModalConfirm = ({
+    isVisible,
+    onClose,
+    onConfirm,
+    title,
+    message
+}: ModalConfirmProps) => {
 
     return (
-        <>
-            <Modal visible={visible} transparent animationType="fade">
-                <View style={styles.overlay}>
-                    <View style={styles.toastCard}>
-                        <Text style={styles.text}>¿Deseas salir sin guardar?</Text>
-                        <View style={styles.row}>
-                            <TouchableOpacity>
-                                <Text style={styles.btnNo}>No</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                                <Text style={styles.btnSi}>Sí, salir</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+        <Modal
+            isVisible={isVisible}
+            onBackdropPress={onClose} // Cierra si tocan fuera
+            onBackButtonPress={onClose} // Para Android
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            useNativeDriver
+            hideModalContentWhileAnimating
+        >
+            <View style={styles.container}>
+                <Text style={styles.title}>{title}</Text>
+
+                <Text style={styles.message}>{message}</Text>
+
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        onPress={onClose}
+                        style={[styles.button, styles.buttonCancel]}
+                    >
+                        <Text style={styles.textCancel}>Volver</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={onConfirm}
+                        style={[styles.button, styles.buttonConfirm]}
+                    >
+                        <Text style={styles.textConfirm}>Confirmar</Text>
+                    </TouchableOpacity>
                 </View>
-            </Modal>
-        </>
+            </View>
+        </Modal>
     )
 }
 
-export default ModalConfirm
-
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)', // Fondo oscuro semitransparente
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    toastCard: {
-        width: '100%',
-        maxWidth: 340,
-        backgroundColor: '#FFFFFF', // Blanco
-        borderRadius: 20,
+    container: {
+        backgroundColor: '#f8fafc',
         padding: 25,
+        borderRadius: 20,
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        elevation: 10, // Sombra para Android
-        overflow: 'hidden'
-    },
-    warningBar: {
-        width: 60,
-        height: 4,
-        backgroundColor: '#ff9900', // Naranja
-        borderRadius: 2,
-        marginBottom: 20,
     },
     title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
+        fontSize: 19,
+        fontWeight: '700',
+        color: '#1e293b',
         marginBottom: 10,
     },
-    text: {
-        fontSize: 15,
-        color: '#666',
+    message: {
         textAlign: 'center',
-        marginBottom: 25,
+        color: '#64748b',
         lineHeight: 22,
+        marginBottom: 25,
     },
-    row: {
+    buttonContainer: {
         flexDirection: 'row',
-        width: '100%',
+        backgroundColor: '#f8fafc',
         gap: 12,
     },
     button: {
         flex: 1,
-        paddingVertical: 14,
+        padding: 14,
         borderRadius: 12,
-        alignItems: 'center',
         justifyContent: 'center',
     },
-    btnNo: {
-        backgroundColor: '#f5f5f5', // Gris muy claro para contraste
+    buttonCancel: {
+        backgroundColor: '#e2e8f0',
     },
-    btnSi: {
-        backgroundColor: '#00A6A6', // Turquesa
+    buttonConfirm: {
+        backgroundColor: '#ef4444', // Rojo para cancelar, cámbialo a tu verde si prefieres
     },
-    btnTextNo: {
-        color: '#666',
+    textCancel: {
+        textAlign: 'center',
+        color: '#475569',
         fontWeight: '600',
-        fontSize: 14,
     },
-    btnTextSi: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-        fontSize: 14,
+    textConfirm: {
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: '600',
     },
 });
+
+export default ModalConfirm

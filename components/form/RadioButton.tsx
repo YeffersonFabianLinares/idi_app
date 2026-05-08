@@ -14,9 +14,10 @@ interface Props {
     label: string;
     options: Option[];
     required?: boolean
+    direction?: 'row' | 'row-reverse' | 'column' | 'column-reverse'
 }
 
-export const RadioButton = ({ name, label, options, required = true }: Props) => {
+export const RadioButton = ({ name, label, options, required = true, direction = 'row' }: Props) => {
     const { control, formState: { errors } } = useFormContext();
     const error = errors[name];
 
@@ -30,7 +31,7 @@ export const RadioButton = ({ name, label, options, required = true }: Props) =>
                 control={control}
                 name={name}
                 render={({ field: { onChange, value } }) => (
-                    <View style={globalStyles.radioContainer}>
+                    <View style={[globalStyles.radioContainer, { flexDirection: direction }]}>
                         {options.map((option) => (
                             <TouchableOpacity
                                 key={option.value}

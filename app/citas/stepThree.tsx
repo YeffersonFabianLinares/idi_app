@@ -2,13 +2,16 @@ import Button from "@/components/form/Button";
 import { RadioButton } from "@/components/form/RadioButton";
 import { Select } from "@/components/form/Select";
 import Select2Paginado from "@/components/form/Select2Paginado";
+import { useAsyncFormHandler } from "@/hook/useAsyncFormHandler";
 import { IDependencesAppoinemnts } from "@/interfaces/IDependencesAppoinemnts";
 import api from "@/plugins/axios";
 import { updateFieldsStepThree } from "@/services/appoinment.service";
 import { globalStyles } from "@/styles/style";
+import { Dispatch, SetStateAction } from "react";
 import { useFormContext } from "react-hook-form";
 import { View } from "react-native";
 import Animated, { FadeInRight } from "react-native-reanimated";
+import Toast from "react-native-toast-message";
 
 
 interface StepThreeProps {
@@ -16,6 +19,7 @@ interface StepThreeProps {
     dependences: IDependencesAppoinemnts;
     stepFields: string[]
     type: string
+    setLoading: Dispatch<SetStateAction<boolean>>
 }
 
 /**
@@ -34,19 +38,25 @@ interface StepThreeProps {
  * @param {string} type - Tipo de cita (LAB/IMG) para filtrar entidades.
  */
 
-const stepThree = ({ dependences, onNext, stepFields, type }: StepThreeProps) => {
+const stepThree = ({ dependences, onNext, stepFields, type, setLoading }: StepThreeProps) => {
 
     /** 
      * Suscripción a cambios en tiempo real del formulario.
      * Se utiliza 'watch' para disparar la aparición de los siguientes campos
      * conforme el usuario completa la información.
      */
-    const { watch, getValues } = useFormContext();
-
+    const { watch, getValues, trigger } = useFormContext();
     const busExam = watch('busExam')
     const cod_depto = watch('cod_depto')
     const cod_empresa = watch('cod_empresa')
     const cod_area = watch('cod_area')
+
+    /**
+        * Hook personalizado para manejar el envío asíncrono.
+        * @returns {execute} Función que envuelve la llamada a la API.
+        * @returns {isLoading} Estado de carga para el LoadingModal.
+    */
+    const { execute } = useAsyncFormHandler()
 
     const optionsExam = [
         { label: 'Código', value: 'C' },
@@ -58,14 +68,28 @@ const stepThree = ({ dependences, onNext, stepFields, type }: StepThreeProps) =>
      * Envía la data filtrada al endpoint 'updateFieldsStepThree' antes de continuar.
      */
     const handlePress = async () => {
-
         const allValues = getValues();
         const fieldNames = [...stepFields, 'id_menbot'];
-        const data = Object.fromEntries(
-            Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
-        );
-        await updateFieldsStepThree(data)
-        onNext()
+        const isValid = await trigger(fieldNames);
+        if (isValid) {
+            const data = Object.fromEntries(
+                Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
+            );
+            setLoading(true)
+            const response = await execute(
+                () => updateFieldsStepThree(data)
+            )
+            if (response.alertSeverity === 'success') {
+                onNext()
+            } else {
+                Toast.show({
+                    type: response.alertSeverity,
+                    text1: 'Idime',
+                    text2: response.message
+                })
+            }
+            setLoading(false)
+        }
     }
 
     /**
