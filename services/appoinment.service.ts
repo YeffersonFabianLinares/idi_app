@@ -61,3 +61,14 @@ export const cancelAppoinment = async (data: any) => {
     const response = await api.put('cancel-appoinment', data)
     return response
 }
+
+export const generatePreparations = async (data: any) => {
+    const response = await api.get(`/show-preparations`, {
+        params: { ordinal: data.ordinal },
+        responseType: 'arraybuffer',
+        headers: {
+            'Accept': 'application/pdf'
+        }
+    });
+    return response.data;
+}

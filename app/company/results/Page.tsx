@@ -3,11 +3,12 @@ import PatientCardInfo from '@/components/PatientCardInfo';
 import { IResult } from '@/interfaces/IResult';
 import { downloadResultPdf, getDeliveryResults } from '@/services/deliveryResults.service';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Directory, File } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
-import { Alert, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInRight } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 
 /**
  * Pantalla de Expediente y Resultados del Paciente.
@@ -47,52 +48,32 @@ const PatientDashboard = () => {
      */
     const downloadPdf = async (ordinal: string) => {
         try {
+            setLoading(true)
             const response = await downloadResultPdf(ordinal)
-            guardarYCompartir(response, ordinal);
-            // const fileUri = `${FileSystem.cacheDirectory}resultado_${ordinal}.pdf`;
-            // const archivo = new File(Directory.cache, `resultado_${ordinal}.pdf`);
-            // await FileSystem.writeAsStringAsync(fileUri, response, {
-            //     encoding: 'base64',
-            // });
-            // if (await Sharing.isAvailableAsync()) {
-            //     await Sharing.shareAsync(fileUri);
-            // }
-        } catch (error) {
-            console.error("Error:", error);
-            Alert.alert("Error", "Ocurrió un fallo al descargar el archivo.");
-        }
-    }
 
-    /**
-     * Manejo de Archivos (File Management):
-     * 
-     * 1. Define una ruta temporal en el caché del dispositivo.
-     * 2. Utiliza 'writeAsync' para decodificar el string base64 y generar el binario PDF.
-     * 3. Invoca 'Sharing.shareAsync' para permitir al usuario enviar el archivo por 
-     *    WhatsApp, correo o guardarlo en su carpeta de archivos local.
-     */
-    const guardarYCompartir = async (response: string, ordinal: string) => {
-        try {
-            // 1. Creamos la ruta completa combinando el directorio y el nombre del archivo
-            // @ts-ignore
-            const path = `${Directory.cache.uri}resultado_${ordinal}.pdf`;
+            if (response.byteLength === 0) {
+                throw new Error("El archivo recibido está vacío.");
+            }
 
-            // 2. Instanciamos el archivo con la ruta completa
-            const archivo = new File(path);
-
-            // 3. Escribimos el contenido (asumiendo que response es Base64)
-            // @ts-ignore
-            await archivo.writeAsync(response, 'base64');
-
-            // 4. Compartimos
+            const archivo = new File(Paths.cache, `resultado_${ordinal}.pdf`);
+            const pdfData = new Uint8Array(response);
+            await archivo.write(pdfData);
             if (await Sharing.isAvailableAsync()) {
-                await Sharing.shareAsync(archivo.uri);
+                await Sharing.shareAsync(archivo.uri, {
+                    mimeType: 'application/pdf',
+                });
             }
         } catch (error) {
-            console.error("Error al guardar PDF:", error);
-            Alert.alert("Error", "No se pudo procesar el archivo.");
+            console.error("Error:", error);
+            Toast.show({
+                type: 'error',
+                text1: 'Idime',
+                text2: 'Ocurrió un fallo al descargar el archivo, por favor intente más tarde'
+            })
+        } finally {
+            setLoading(false)
         }
-    };
+    }
 
     /**
     * Ciclo de vida: Carga inicial.
@@ -109,12 +90,6 @@ const PatientDashboard = () => {
         getDeliveryResultsFn()
     }, [])
 
-    if (loading) {
-        return (
-            <LoadingModal visible={loading} />
-        )
-    }
-
     /**
      * UI y Experiencia de Usuario:
      * - Tarjeta de Expediente: Muestra datos calculados dinámicamente (Edad) y formateados (Cédula).
@@ -127,7 +102,7 @@ const PatientDashboard = () => {
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.content}>
                 <PatientCardInfo />
-
+                <LoadingModal visible={loading} />
                 <View>
                     <Text style={styles.title_label}>RESULTADOS DE EXÁMENES</Text>
                 </View>

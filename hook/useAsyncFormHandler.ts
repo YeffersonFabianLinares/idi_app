@@ -60,6 +60,9 @@ export const useAsyncFormHandler = () => {
         alertSeverity: 'info',
     });
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     /**
  * Ejecuta una función asíncrona y gestiona automáticamente sus estados y errores.
  * 
@@ -72,7 +75,7 @@ export const useAsyncFormHandler = () => {
  * @returns Promesa con un objeto que contiene la `response`, el `message` final y la `alertSeverity`.
  */
     const execute = useCallback(async <T,>(
-        asyncFunction: () => Promise<T>,
+        asyncFunction: (signal: AbortSignal) => Promise<T>,
         successMessage?: string,
         errorMessage?: string
     ): Promise<{ response: T | undefined; message: string, alertSeverity: AlertSeverity }> => {
@@ -80,7 +83,8 @@ export const useAsyncFormHandler = () => {
         setState({ isLoading: true, alertMessage: null, alertSeverity: 'info' });
 
         try {
-            const response = await asyncFunction();
+            const response = await asyncFunction(controller.signal);
+            clearTimeout(timeoutId);
             // @ts-ignore
             const successMsg: string = successMessage || response?.data?.message || 'Operación completada con éxito.';
 
@@ -95,8 +99,12 @@ export const useAsyncFormHandler = () => {
             const axiosError = err as AxiosError;
 
             let finalErrorMessage = errorMessage || 'Ha ocurrido un error inesperado.';
-            
-            if (axiosError.status) {
+
+            // @ts-ignore
+            if (axiosError.code === 'ECONNABORTED' || err.name === 'AbortError') {
+                finalErrorMessage = 'La solicitud ha tardado demasiado, intenta de nuevo más tarde (Tiempo de espera agotado).';
+            }
+            else if (axiosError.status) {
                 if (axiosError.status >= 500) {
                     // @ts-ignore
                     finalErrorMessage = axiosError?.response?.data?.message || 'Error interno del servidor. Inténtalo más tarde.';

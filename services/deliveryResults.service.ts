@@ -16,7 +16,10 @@ export const downloadResultPdf = async (ordinal: string) => {
     try {
         const response = await api.get(`/download-results`, {
             params: { ordinal: ordinal },
-            responseType: 'blob'
+            responseType: 'arraybuffer',
+            headers: {
+                'Accept': 'application/pdf'
+            }
         });
         return response.data;
     }

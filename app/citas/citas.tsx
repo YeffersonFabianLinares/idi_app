@@ -1,5 +1,4 @@
 // @ts-ignore
-import logoImgDiagnostico from '@/assets/images/citas/asesor.png';
 // @ts-ignore
 import logoImgDemanda from '@/assets/images/citas/demanda.png';
 // @ts-ignore
@@ -7,7 +6,7 @@ import logoImgTorax from '@/assets/images/citas/torax.png';
 import TitleApp from '@/components/TitleApp';
 import { globalStyles } from '@/styles/style';
 import { Ionicons } from '@expo/vector-icons';
-import { Href, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -37,17 +36,16 @@ export default function SolicitaCita() {
             link: '/citas/FormAppoinment',
             type: 'demanda'
         },
-        {
-            description: 'Si requieres otra especialidad y/o vienes remitido de algún asegurador (EPS), da clic sobre esta imagen.',
-            logo: logoImgDiagnostico,
-            link: '/citas/formSpeciality/Page'
-        },
+        // {
+        //     description: 'Si requieres otra especialidad y/o vienes remitido de algún asegurador (EPS), da clic sobre esta imagen.',
+        //     logo: logoImgDiagnostico,
+        //     link: '/citas/formSpeciality/Page'
+        // },
     ];
 
     const agendarCita = (link: routesAppoinments, type: string | undefined) => {
         router.push({
-            // @ts-ignore
-            pathname: link as Href,
+            pathname: link as any,
             params: { type: type }
         });
     }

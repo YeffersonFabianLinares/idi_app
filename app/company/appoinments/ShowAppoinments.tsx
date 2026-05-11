@@ -3,10 +3,12 @@ import ModalConfirm from '@/components/ModalConfirm';
 import NoResult from '@/components/NoResult';
 import PatientCardInfo from '@/components/PatientCardInfo';
 import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
-import { cancelAppoinment, getAppoinmentsByPatient } from '@/services/appoinment.service';
+import { cancelAppoinment, generatePreparations, getAppoinmentsByPatient } from '@/services/appoinment.service';
 import { globalStyles } from '@/styles/style';
 import { getStatusName } from '@/utils/helpers';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // O usa react-native-vector-icons
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -42,6 +44,31 @@ export default function ShowAppoinments() {
         })
         getAppoinmentsByPatientFn()
         setModalVisible(false)
+    }
+
+    const downloadPreparations = async (data: any) => {
+        try {
+            const response = await generatePreparations(data)
+
+            if (response.byteLength === 0) {
+                throw new Error("El archivo recibido está vacío.");
+            }
+
+            const archivo = new File(Paths.cache, `resultado_${data.ordinal}.pdf`);
+            const pdfData = new Uint8Array(response);
+            await archivo.write(pdfData);
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(archivo.uri, {
+                    mimeType: 'application/pdf',
+                });
+            }
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Idime',
+                text2: 'Ocurrió un fallo al descargar el archivo, por favor intente más tarde'
+            })
+        }
     }
 
     useEffect(() => {
@@ -96,7 +123,9 @@ export default function ShowAppoinments() {
 
                                         {
                                             item.estado === 'AC' && <>
-                                                <TouchableOpacity style={styles.linkContainer}>
+                                                <TouchableOpacity style={styles.linkContainer} onPress={() => downloadPreparations({
+                                                    ordinal: item.ordinal
+                                                })}>
                                                     <MaterialCommunityIcons name="file-document-outline" size={18} color="#2D6A4F" />
                                                     <Text style={styles.linkText}>Ver preparaciones</Text>
                                                 </TouchableOpacity>

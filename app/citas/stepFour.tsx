@@ -1,16 +1,17 @@
 import Button from '@/components/form/Button';
 import { InputDate } from '@/components/form/InputDate';
-import { RadioButton } from '@/components/form/RadioButton';
 import { Select } from '@/components/form/Select';
 import { LoadingModal } from '@/components/LoadingModal';
 import { getDependencesStepFour, searchAppoinmentDisponibily } from '@/services/appoinment.service';
 import { globalStyles } from '@/styles/style';
 import { testPusherConnection } from '@/utils/echo';
-import { Calendar, Clock, MapPin } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { Calendar, ChevronDown, Clock, MapPin } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
+import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
+import Toast from 'react-native-toast-message';
 
 interface StepFourProps {
     stepFields: string[]
@@ -46,6 +47,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
 
     const busqueda = watch('busqueda')
     const acepta_id = watch('acepta_id')
+    const scrollRef = useRef<ScrollView>(null);
 
     // TIMEOUT DE SEGURIDAD: Si en 30s no pasa nada, cancelamos
     const safetyTimer = setTimeout(() => {
@@ -67,6 +69,10 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
         { label: 'Tarde (PM)', id: 'P' },
         { label: 'Todas (T)', id: 'T' },
     ]
+
+    const scrollToBottom = () => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+    };
 
     /** 
      * Conectividad en Tiempo Real (Pusher):
@@ -107,6 +113,15 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                             };
                         });
                     setHorarios(listadoCitas)
+                    console.log('listadoCitas ==> ', listadoCitas);
+
+                    if (listadoCitas.length === 0) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Idime',
+                            text2: rawData['mensaje']
+                        })
+                    }
                     setLoading(false)
                 }
             });
@@ -281,17 +296,26 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                     </TouchableOpacity>
                 ))}
                 {
-                    acepta_id &&
-                    <View
-                        style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', marginBottom: 15 }}>
-                        <Button
-                            title='Confirmar Cita'
-                            onPress={handleFinish}
-                        />
+                    (acepta_id && horarios.length > 0) &&
+                    <View>
+                        <View
+                            style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', marginBottom: 15 }}>
+                            <Button
+                                title='Confirmar Cita'
+                                onPress={handleFinish}
+                            />
+                        </View>
                     </View>
                 }
+                <TouchableOpacity
+                    style={styles.floatingButton}
+                    onPress={scrollToBottom}
+                    activeOpacity={0.8}
+                >
+                    <ChevronDown color="white" size={30} />
+                </TouchableOpacity>
 
-                <View>
+                {/* <View>
                     <RadioButton
                         label='Tu cita fue agendada exitosamente, a tu celular llegará la confirmación y a tu correo electrónico fue enviada la preparación y requisitos correspondientes.'
                         name='sede_dispo'
@@ -309,7 +333,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                             }
                         ]}
                     />
-                </View>
+                </View> */}
             </View>
         </Animated.View >
     );
@@ -371,6 +395,22 @@ const styles = StyleSheet.create({
     labelClinica: { fontSize: 10, color: '#888', fontWeight: 'bold', letterSpacing: 1 },
     nameClinica: { fontSize: 15, fontWeight: 'bold', color: '#222', marginTop: 2 },
     addressText: { marginLeft: 5, color: '#666', fontSize: 12, flexShrink: 1 },
+    floatingButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#2D7A78',
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5, // Sombra en Android
+        shadowColor: '#000', // Sombra en iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
 });
 
 export default StepFour;

@@ -5,8 +5,8 @@ export const testPusherConnection = () => {
     try {
         // Configuramos Pusher manualmente sin Laravel Echo
         const pusher = new Pusher('9s3wfcipdtrcjmzztt3i', {
-            wsHost: '10.2.3.160',
-            wsPort: 8080,
+            wsHost: '192.168.73.74',
+            wsPort: 8082,
             forceTLS: false,
             disableStats: true,
             enabledTransports: ['ws', 'wss'],
