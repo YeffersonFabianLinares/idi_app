@@ -115,7 +115,7 @@ const StepOne = ({ dependences, setLoading, onNext, stepFields }: StepOneProps) 
                     label='¿En qué servicio está interesado?'
                     name='cod_area'
                     placeholder='Servicio'
-                    options={dependences.areas} />
+                    options={dependences.areas || []} />
             </View>
             <View>
                 <Select

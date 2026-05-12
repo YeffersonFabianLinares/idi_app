@@ -24,6 +24,6 @@ export const MenuCompany: Menu[] = [
         subtitle: 'Consulta y descarga tus exámenes médicos',
         icon: <MaterialCommunityIcons name="file-edit-outline" size={30} color="white" />,
         color: '',
-        link: '/citas/citas'
+        link: '/citas/FormAppoinment'
     }
 ]

@@ -4,7 +4,7 @@ import { IAppoinment } from "@/schemas/appoinment.schema";
 
 export const dependencesAppoinments = async (type: string) => {
     const response = await api.get(`/dependences-appoinments/`, { params: { type: type } });
-    return response.data;
+    return response;
 }
 
 export const initAppoinment = async (data: any) => {
@@ -24,7 +24,7 @@ export const updateFieldsStepTwo = async (data: any) => {
 
 export const searchAppoinmentDisponibily = async (data: any) => {
     const response = await api.get('search-appoinment-disponibily', { params: data })
-    return response.data
+    return response
 }
 
 export const updateFieldsStepThree = async (data: any) => {

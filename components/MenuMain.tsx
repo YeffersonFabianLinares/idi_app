@@ -18,7 +18,7 @@ export const MenuMain: Menu[] = [
         icon: <FontAwesome5 name="user-alt" size={26} color="white" />,
         color: '#ff9900',
         link: '/auth/Login',
-        tipo: 'Paciente'
+        type: 'Paciente'
     },
     {
         id: 4,
@@ -26,6 +26,7 @@ export const MenuMain: Menu[] = [
         subtitle: 'Agendamientos de citas',
         icon: <MaterialCommunityIcons name="file-document-edit" size={30} color="white" />,
         color: '#ff9900',
-        link: '/citas/citas'
+        link: '/citas/FormAppoinment',
+        type: 'diagnostica',
     },
 ];

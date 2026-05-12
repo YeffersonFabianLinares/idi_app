@@ -99,9 +99,7 @@ const FormAppoinment = () => {
 
     const onSubmit = async (data: IAppoinment) => {
         const response = await execute(() => appoinmentPrepareReserved(data))
-        if (response.alertSeverity === 'success') {
-            SetIsSaved(true)
-        }
+        SetIsSaved(true)
     }
 
     const handleConfirmExit = () => {
@@ -115,8 +113,9 @@ const FormAppoinment = () => {
         const dependencesAppoinmentsFn = async () => {
             try {
                 setLoading(true)
-                const response = await dependencesAppoinments(type)
-                setDependences(response);
+                const response = await execute(() => dependencesAppoinments(type))
+                
+                setDependences(response.response?.data);
             } catch (error) {
                 console.error('error ==> ', error);
             } finally {
@@ -193,7 +192,7 @@ const FormAppoinment = () => {
                             </View>
                             <View style={currentStep === 3 ? { display: 'contents' } : { display: 'none' }}>
                                 <StepThree dependences={dependences} stepFields={fieldsByStep[3]} onNext={handleNext} type={type}
-                                setLoading={setLoading} />
+                                    setLoading={setLoading} />
                             </View>
                             {
                                 currentStep === 4 &&

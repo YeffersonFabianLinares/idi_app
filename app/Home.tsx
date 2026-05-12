@@ -49,7 +49,7 @@ export const Home = () => {
                     />
                 </View>
 
-                <MenuGeneral options={options}></MenuGeneral>
+                <MenuGeneral options={options} />
             </ScrollView>
         </View>
     );

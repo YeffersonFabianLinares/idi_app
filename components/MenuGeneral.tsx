@@ -1,6 +1,6 @@
 import { Menu } from "@/interfaces/Menu"
 import { Ionicons } from "@expo/vector-icons"
-import { Href, useRouter } from "expo-router"
+import { useRouter } from "expo-router"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import Animated, { FadeInUp } from "react-native-reanimated"
 
@@ -11,12 +11,11 @@ interface MenuGeneralProps {
 const MenuGeneral = ({ options }: MenuGeneralProps) => {
 
     const router = useRouter()
-    const redirect = (link: string, tipo?: string) => {
+    const redirect = (link: string, type?: string) => {
         router.push(
             {
-                // @ts-ignore
-                pathname: link as Href,
-                params: { tipo: tipo }
+                pathname: link as any,
+                params: { type: type }
             }
         )
     }
@@ -29,7 +28,7 @@ const MenuGeneral = ({ options }: MenuGeneralProps) => {
                         key={index}
                         entering={FadeInUp.delay(200 * index).springify()}
                     >
-                        <TouchableOpacity style={styles.optionButton} activeOpacity={0.7} onPress={() => redirect(item.link, item.tipo)}>
+                        <TouchableOpacity style={styles.optionButton} activeOpacity={0.7} onPress={() => redirect(item.link, item.type)}>
                             <View style={styles.iconCircle}>
                                 {item.icon}
                             </View>

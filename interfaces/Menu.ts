@@ -5,5 +5,5 @@ export interface Menu {
     color: string
     icon: React.ReactNode;
     link: string
-    tipo?: string
+    type?: string
 }

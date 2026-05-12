@@ -40,7 +40,7 @@ export default function LoginScreen() {
     /** 
      * Indica el tipo de acceso (recibido por parámetros de ruta).
     */
-    const { tipo } = useLocalSearchParams<{ tipo: string }>();
+    const { type } = useLocalSearchParams<{ type: string }>();
     /** Estados locales para alternar la visibilidad de los campos de contraseña. */
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const headerHeight = useHeaderHeight();
@@ -72,8 +72,6 @@ export default function LoginScreen() {
         )
 
         if (response.alertSeverity === 'success') {
-            console.log('response.response?.user ==> ', response.response?.user.ordinal);
-
             if (response.response?.user?.forgot_password == true) {
                 router.push({
                     pathname: '/auth/ResetPassword',
@@ -96,7 +94,7 @@ export default function LoginScreen() {
                     await SecureStore.setItemAsync('user', JSON.stringify(userLoggedInfo))
                 }
                 router.dismissAll()
-                router.push('/company/Home')
+                router.replace('/company/Home')
             }
         } else {
             Toast.show({
@@ -115,7 +113,7 @@ export default function LoginScreen() {
     }
 
     useEffect(() => {
-        methods.setValue('tipo', tipo)
+        methods.setValue('type', type)
     }, [])
 
     /*

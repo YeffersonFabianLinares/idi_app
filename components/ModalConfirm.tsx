@@ -37,7 +37,7 @@ const ModalConfirm = ({
                         onPress={onClose}
                         style={[styles.button, styles.buttonCancel]}
                     >
-                        <Text style={styles.textCancel}>Volver</Text>
+                        <Text style={styles.textCancel}>Cancelar</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity

@@ -2,9 +2,9 @@ import Button from '@/components/form/Button';
 import { InputDate } from '@/components/form/InputDate';
 import { Select } from '@/components/form/Select';
 import { LoadingModal } from '@/components/LoadingModal';
+import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
 import { getDependencesStepFour, searchAppoinmentDisponibily } from '@/services/appoinment.service';
 import { globalStyles } from '@/styles/style';
-import { testPusherConnection } from '@/utils/echo';
 import { Calendar, ChevronDown, Clock, MapPin } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -40,22 +40,15 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
     const [horarios, setHorarios] = useState<any[]>([])
     const { trigger, getValues, setValue, watch } = useFormContext()
     const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null);
     const [dependences, setDependences] = useState<IDependences>()
+    const [openModalFinish, setOpenModalFinish] = useState<boolean>(false)
     // const idMenbot = 6235486;
-    const idMenbot = getValues('id_menbot');
 
     const busqueda = watch('busqueda')
     const acepta_id = watch('acepta_id')
     const scrollRef = useRef<ScrollView>(null);
 
-    // TIMEOUT DE SEGURIDAD: Si en 30s no pasa nada, cancelamos
-    const safetyTimer = setTimeout(() => {
-        if (loading) {
-            setLoading(false);
-            setError('El servidor tardó demasiado en responder. Intenta de nuevo.');
-        }
-    }, 30000);
+    const { execute, isLoading } = useAsyncFormHandler()
 
     const optionsBusqueda = [
         { id: '1', label: 'Buscar la primera cita disponible' },
@@ -73,70 +66,6 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
     const scrollToBottom = () => {
         scrollRef.current?.scrollToEnd({ animated: true });
     };
-
-    /** 
-     * Conectividad en Tiempo Real (Pusher):
-     * 1. Se suscribe al canal privado 'menbot.{id_menbot}'.
-     * 2. Escucha el evento '.appointment.ready' que envía el listado de citas.
-     * 3. Transforma el objeto plano del socket en un array de horarios mapeado por índice.
-     * 4. Escucha '.appoinment.reserved' para confirmar el bloqueo del espacio.
-     */
-    useEffect(() => {
-        setValue('id_menbot', idMenbot)
-
-        const pusher = testPusherConnection();
-        if (pusher) {
-            const channelName = `menbot.${idMenbot}`
-            pusher.unsubscribe(channelName)
-            const channel = pusher.subscribe(channelName);
-            channel.bind('.appointment.ready', (data: any) => {
-                if (data.status === 'error') {
-                    setError(data.message || 'Error en la reserva');
-                    setLoading(false);
-                    clearTimeout(safetyTimer);
-                    return;
-                }
-                setLoading(false)
-                const rawData = data.data
-
-                if (rawData) {
-                    const listadoCitas = Object.keys(rawData)
-                        .filter(key => { return key.startsWith('fec_dispo_') && rawData[key] !== null; })
-                        .map(key => {
-                            const index = key.split('_').pop();
-                            return {
-                                id: index,
-                                fecha: rawData[`fec_dispo_${index}`],
-                                hora: rawData[`hor_dispo_${index}`],
-                                sede: rawData[`sed_dispo_${index}`],
-                                dir_sede: rawData[`sede${index}`]?.direccion1 ?? null
-                            };
-                        });
-                    setHorarios(listadoCitas)
-                    console.log('listadoCitas ==> ', listadoCitas);
-
-                    if (listadoCitas.length === 0) {
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Idime',
-                            text2: rawData['mensaje']
-                        })
-                    }
-                    setLoading(false)
-                }
-            });
-            channel.bind('.appoinment.reserved', (data: any) => {
-                if (data.status === 'error') {
-                    setError(data.message || 'Error en la reserva');
-                    setLoading(false);
-                    clearTimeout(safetyTimer);
-                    return;
-                }
-                console.log('message asigna ==> ', data);
-                setLoading(false)
-            })
-        }
-    }, [])
 
     useEffect(() => {
         const getDependencesFn = async () => {
@@ -178,7 +107,34 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
             setHorarios([])
             setValue('acepta_id', null)
             setLoading(true)
-            await searchAppoinmentDisponibily(data)
+            const response = await execute(() => searchAppoinmentDisponibily(data))
+            console.log('response ==> ', response);
+
+            if (response.alertSeverity === 'success') {
+                const rawData = response.response?.data
+                const listadoCitas = Object.keys(rawData)
+                    .filter(key => { return key.startsWith('fec_dispo_') && rawData[key] !== null; })
+                    .map(key => {
+                        const index = key.split('_').pop();
+                        return {
+                            id: index,
+                            fecha: rawData[`fec_dispo_${index}`],
+                            hora: rawData[`hor_dispo_${index}`],
+                            sede: rawData[`sed_dispo_${index}`],
+                            dir_sede: rawData[`sede${index}`]?.direccion1 ?? null
+                        };
+                    });
+                setHorarios(listadoCitas)
+
+                if (listadoCitas.length === 0) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Idime',
+                        text2: rawData['mensaje']
+                    })
+                }
+                setLoading(false)
+            }
         }
     }
 
@@ -203,7 +159,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                         Seleccione el horario que mejor se adapte a su disponibilidad en la clínica seleccionada.
                     </Text>
                 </View>
-                <LoadingModal visible={loading} />
+                <LoadingModal visible={loading || isLoading} />
                 <View>
                     <Select
                         label='Tipo de búsqueda'
@@ -314,26 +270,6 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                 >
                     <ChevronDown color="white" size={30} />
                 </TouchableOpacity>
-
-                {/* <View>
-                    <RadioButton
-                        label='Tu cita fue agendada exitosamente, a tu celular llegará la confirmación y a tu correo electrónico fue enviada la preparación y requisitos correspondientes.'
-                        name='sede_dispo'
-                        direction='column'
-                        options={[
-                            {
-                                label: 'Agendar otra cita de la misma especialidad para este usuario',
-                                value: '1'
-                            }, {
-                                label: 'Agendar una cita para otra especialidad',
-                                value: '2'
-                            }, {
-                                label: 'Salir',
-                                value: '3'
-                            }
-                        ]}
-                    />
-                </View> */}
             </View>
         </Animated.View >
     );

@@ -4,9 +4,9 @@ import Pusher from 'pusher-js/react-native';
 export const testPusherConnection = () => {
     try {
         // Configuramos Pusher manualmente sin Laravel Echo
-        const pusher = new Pusher('9s3wfcipdtrcjmzztt3i', {
-            wsHost: '192.168.73.74',
-            wsPort: 8082,
+        const pusher = new Pusher(process.env.EXPO_PUBLIC_WS_KEY || '', {
+            wsHost: process.env.EXPO_PUBLIC_WS_HOST,
+            wsPort: parseInt(process.env.EXPO_PUBLIC_WS_PORT || '0'),
             forceTLS: false,
             disableStats: true,
             enabledTransports: ['ws', 'wss'],
