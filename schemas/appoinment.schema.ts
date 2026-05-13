@@ -29,7 +29,8 @@ export const appoinmentSchema = z.object({
     hora_dispo: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD),
     sede_dispo: z.string(MESSAGES.REQUIRED_FIELD).optional().nullable(),
     fec_dispo: z.date(MESSAGES.DATE_INVALID).optional().nullable(),
-    acepta_id: z.any().nullable()
+    acepta_id: z.any().nullable(),
+    post_mortem: z.string(MESSAGES.REQUIRED_FIELD).nullable().optional()
 }).superRefine((values, ctx) => {
     // Validación para sede_dispo (Si busqueda es '2' o '4')
     if (['2', '4'].includes(values.busqueda)) {

@@ -36,13 +36,10 @@ interface IDependences {
  * @param {() => void} onFinish - Función para confirmar la reserva final.
  */
 const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
-    // const [selectedId, setSelectedId] = useState<number | null>(null);
     const [horarios, setHorarios] = useState<any[]>([])
     const { trigger, getValues, setValue, watch } = useFormContext()
     const [loading, setLoading] = useState<boolean>(false)
     const [dependences, setDependences] = useState<IDependences>()
-    const [openModalFinish, setOpenModalFinish] = useState<boolean>(false)
-    // const idMenbot = 6235486;
 
     const busqueda = watch('busqueda')
     const acepta_id = watch('acepta_id')
@@ -94,52 +91,57 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
      * de consulta en las bases de datos de citas y emita la respuesta por el socket.
      */
     const onPress = async () => {
-        const allValues = getValues();
-        const fieldNames = [...stepFields, 'id_menbot', 'sede_dispo', 'hora_dispo'];
+        try {
+            const allValues = getValues();
+            const fieldNames = [...stepFields, 'id_menbot', 'sede_dispo', 'hora_dispo'];
 
-        const isValid = await trigger(fieldNames);
+            const isValid = await trigger(fieldNames);
 
-        if (isValid) {
-            // Creamos un objeto nuevo solo con las llaves permitidas
-            const data = Object.fromEntries(
-                Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
-            );
-            setHorarios([])
-            setValue('acepta_id', null)
-            setLoading(true)
-            const response = await execute(() => searchAppoinmentDisponibily(data))
-            console.log('response ==> ', response);
+            if (isValid) {
+                // Creamos un objeto nuevo solo con las llaves permitidas
+                const data = Object.fromEntries(
+                    Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
+                );
+                setHorarios([])
+                setValue('acepta_id', null)
+                setLoading(true)
+                const response = await execute(() => searchAppoinmentDisponibily(data))
 
-            if (response.alertSeverity === 'success') {
-                const rawData = response.response?.data
-                const listadoCitas = Object.keys(rawData)
-                    .filter(key => { return key.startsWith('fec_dispo_') && rawData[key] !== null; })
-                    .map(key => {
-                        const index = key.split('_').pop();
-                        return {
-                            id: index,
-                            fecha: rawData[`fec_dispo_${index}`],
-                            hora: rawData[`hor_dispo_${index}`],
-                            sede: rawData[`sed_dispo_${index}`],
-                            dir_sede: rawData[`sede${index}`]?.direccion1 ?? null
-                        };
-                    });
-                setHorarios(listadoCitas)
+                if (response.alertSeverity === 'success') {
+                    const rawData = response.response?.data
+                    const listadoCitas = Object.keys(rawData)
+                        .filter(key => { return key.startsWith('fec_dispo_') && rawData[key] !== null; })
+                        .map(key => {
+                            const index = key.split('_').pop();
+                            return {
+                                id: index,
+                                fecha: rawData[`fec_dispo_${index}`],
+                                hora: rawData[`hor_dispo_${index}`],
+                                sede: rawData[`sed_dispo_${index}`],
+                                dir_sede: rawData[`sede${index}`]?.direccion1 ?? null
+                            };
+                        });
+                    setHorarios(listadoCitas)
 
-                if (listadoCitas.length === 0) {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Idime',
-                        text2: rawData['mensaje']
-                    })
+                    if (listadoCitas.length === 0) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Idime',
+                            text2: rawData['mensaje']
+                        })
+                    }
                 }
-                setLoading(false)
             }
+        } catch (error) {
+            console.error('Error interno');
+        } finally {
+            setLoading(false)
         }
     }
 
     const handleFinish = () => {
-        setLoading(true)
+        // setLoading(true)
+        
         onFinish()
     }
 

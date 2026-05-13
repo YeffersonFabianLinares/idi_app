@@ -96,7 +96,9 @@ export default function ShowAppoinments() {
                                 {appoinemnts.map((item, index) => (
                                     <View style={styles.card} key={index}>
                                         <View style={styles.header}>
-                                            <Text style={styles.titleText}>{item.examen.nombre}</Text>
+                                            <View style={{maxWidth: '80%'}}>
+                                                <Text style={styles.titleText} numberOfLines={2}>{item.examen.nombre}</Text>
+                                            </View>
                                             <View style={[styles.badge, { backgroundColor: item.estado === 'AC' ? '#E0F7F9' : '#F5F5F5' }]}>
                                                 <Text style={styles.badgeText}>{getStatusName(item.estado)}</Text>
                                             </View>
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
     typeText: { fontSize: 12, color: '#6C757D', fontWeight: '600' },
     badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
     badgeText: { fontSize: 10, color: '#00A8A8', fontWeight: 'bold' },
-    titleText: { fontSize: 18, fontWeight: 'bold', color: '#212529', marginBottom: 16 },
+    titleText: { fontSize: 17, fontWeight: 'bold', color: '#212529', marginBottom: 16 },
     infoRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
     infoItem: { flexDirection: 'row', flex: 1 },
     infoTextContainer: { marginLeft: 8 },

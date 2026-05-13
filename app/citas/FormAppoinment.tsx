@@ -1,3 +1,5 @@
+import Button from '@/components/form/Button';
+import { RadioButton } from '@/components/form/RadioButton';
 import { LoadingModal } from '@/components/LoadingModal';
 import ModalConfirm from '@/components/ModalConfirm';
 import { StepProgressBar } from '@/components/StepProgressBar';
@@ -9,10 +11,12 @@ import { globalStyles } from '@/styles/style';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useFocusEffect } from '@react-navigation/native';
-import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
+import { router, Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import Modal from 'react-native-modal';
+import Toast from 'react-native-toast-message';
 import StepFour from './stepFour';
 import StepOne from './stepOne';
 import StepThree from './stepThree';
@@ -46,6 +50,7 @@ const FormAppoinment = () => {
     const [isSaved, SetIsSaved] = useState<boolean>(false)
     const headerHeight = useHeaderHeight();
     const [pendingAction, setPendingAction] = useState<any>(null);
+    const [isModalFinishVisible, setIsModalFinishVisible] = useState(false);
     const [isVisible, setModalVisible] = useState(false);
 
     /** 
@@ -69,6 +74,22 @@ const FormAppoinment = () => {
         },
         mode: "onChange",
     })
+
+
+    const post_mortem = methods.watch('post_mortem')
+
+    const optionsPostFinish = [
+        {
+            label: 'Agendar otra cita de la misma especialidad para este usuario',
+            value: '1'
+        }, {
+            label: 'Agendar una cita para otra especialidad',
+            value: '2'
+        }, {
+            label: 'Salir',
+            value: '3'
+        }
+    ]
 
     /**
      * Hook personalizado para manejar el envío asíncrono.
@@ -98,8 +119,59 @@ const FormAppoinment = () => {
     }
 
     const onSubmit = async (data: IAppoinment) => {
+        console.log('here11');
+        setLoading(false)
+
         const response = await execute(() => appoinmentPrepareReserved(data))
-        SetIsSaved(true)
+        Toast.show({
+            type: response.alertSeverity,
+            text1: 'Idime',
+            text2: response.message
+        })
+        console.log('response.alertSeverity ==> ', response.alertSeverity);
+
+        if (response.alertSeverity === 'success') {
+            SetIsSaved(true)
+            console.log('here');
+            setIsModalFinishVisible(true)
+            console.log('isModalFinishVisible ==> ', isModalFinishVisible);
+
+        }
+    }
+
+    const onSubmitPostMortem = () => {
+        setIsModalFinishVisible(false)
+        switch (post_mortem) {
+            case '1': // Agendar cita para mismo paciente y especialidad
+                const allValues = methods.getValues();
+                const fieldNames = [...fieldsByStep[1], ...fieldsByStep[2]]
+                const data = Object.fromEntries(
+                    Object.entries(allValues).filter(([key]) => fieldNames.includes(key))
+                );
+                methods.reset(data)
+                setCurrentStep(1)
+                SetIsSaved(false)
+                break;
+
+            case '2': // Agendar cita para otra especialidad
+                methods.reset()
+                setCurrentStep(1)
+                SetIsSaved(false)
+                break;
+
+            case '3': // El caso de Salir
+                SetIsSaved(true)
+                router.replace('/Home');
+                break;
+
+            default: // default
+                Toast.show({
+                    type: 'error',
+                    text1: 'Idime',
+                    text2: 'Ninguna opción coincide'
+                })
+                break;
+        }
     }
 
     const handleConfirmExit = () => {
@@ -114,7 +186,7 @@ const FormAppoinment = () => {
             try {
                 setLoading(true)
                 const response = await execute(() => dependencesAppoinments(type))
-                
+
                 setDependences(response.response?.data);
             } catch (error) {
                 console.error('error ==> ', error);
@@ -141,6 +213,7 @@ const FormAppoinment = () => {
                 e.preventDefault();
                 setPendingAction(e.data.action);
                 setModalVisible(true);
+                setIsModalFinishVisible(false)
             };
 
             // Escuchar el evento de navegación
@@ -172,6 +245,7 @@ const FormAppoinment = () => {
                     onConfirm={() => handleConfirmExit()}
                     title='Confirmación'
                     message='¿Estás seguro de que quieres salir?' />
+                    <Button title='1' onPress={() => setIsModalFinishVisible(true)}></Button>
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={headerHeight + 20}>
                     <LoadingModal visible={loading} />
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -184,6 +258,34 @@ const FormAppoinment = () => {
                                 titles={["Información de la Cita", "Información Personal", "Información del Examen", "Confirmación"]}
                                 onBack={handleBack}
                             />
+                            <Modal
+                                isVisible={isModalFinishVisible}
+                                animationIn="zoomIn"
+                                animationOut="zoomOut"
+                                useNativeDriver
+                                hideModalContentWhileAnimating>
+                                <View style={styles.container}>
+                                    <View style={styles.buttonContainer}>
+                                        <RadioButton
+                                            label='Tu cita fue agendada exitosamente, a tu celular llegará la confirmación y a tu correo electrónico fue enviada la 
+                                                preparación y requisitos correspondientes.'
+                                            name='post_mortem'
+                                            direction='column'
+                                            justifyContent='flex-start'
+                                            options={optionsPostFinish}
+                                        />
+                                    </View>
+                                    {post_mortem &&
+                                        <View style={{
+                                            flex: 1,
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }}>
+                                            <Button title='Confirmar' onPress={onSubmitPostMortem}></Button>
+                                        </View>
+                                    }
+                                </View>
+                            </Modal>
                             <View style={currentStep === 1 ? { display: 'contents' } : { display: 'none' }}>
                                 <StepOne dependences={dependences} onNext={handleNext} stepFields={fieldsByStep[1]} setLoading={setLoading} />
                             </View>
@@ -207,5 +309,19 @@ const FormAppoinment = () => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#f8fafc',
+        padding: 25,
+        borderRadius: 20,
+        alignItems: 'center',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#f8fafc',
+        gap: 12,
+    },
+});
 
 export default FormAppoinment;

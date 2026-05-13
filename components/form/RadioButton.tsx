@@ -1,7 +1,7 @@
 import { globalStyles } from '@/styles/style';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { type FlexStyle, Text, TouchableOpacity, View } from 'react-native';
 import ErrorMessage from '../ErrorMessage';
 
 interface Option {
@@ -14,10 +14,11 @@ interface Props {
     label: string;
     options: Option[];
     required?: boolean
-    direction?: 'row' | 'row-reverse' | 'column' | 'column-reverse'
+    direction?: FlexStyle['flexDirection'],
+    justifyContent?: FlexStyle['justifyContent']
 }
 
-export const RadioButton = ({ name, label, options, required = true, direction = 'row' }: Props) => {
+export const RadioButton = ({ name, label, options, required = true, direction = 'row', justifyContent = 'center' }: Props) => {
     const { control, formState: { errors } } = useFormContext();
     const error = errors[name];
 
@@ -31,12 +32,15 @@ export const RadioButton = ({ name, label, options, required = true, direction =
                 control={control}
                 name={name}
                 render={({ field: { onChange, value } }) => (
-                    <View style={[globalStyles.radioContainer, { flexDirection: direction }]}>
+                    <View style={[globalStyles.radioContainer,
+                    direction === 'column' && { flexDirection: direction }]}>
                         {options.map((option) => (
                             <TouchableOpacity
                                 key={option.value}
                                 style={[
                                     globalStyles.radioButton,
+                                    direction === 'column' && { width: '100%', flex: 0 },
+                                    justifyContent && { justifyContent: justifyContent },
                                     value === option.value && globalStyles.radioActive
                                 ]}
                                 onPress={() => onChange(option.value)}
