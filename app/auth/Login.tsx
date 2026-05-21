@@ -185,12 +185,16 @@ export default function LoginScreen() {
                                     ]}
                                 />
 
-                                <Button
-                                    title='Ingresar'
-                                    onPress={methods.handleSubmit(onSubmit)}
-                                />
-
-
+                                <View style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                }}>
+                                    <Button
+                                        title='Ingresar'
+                                        onPress={methods.handleSubmit(onSubmit)}
+                                    />
+                                </View>
                                 <TouchableOpacity style={{ marginTop: 20 }} onPress={goForgotPassword}>
                                     <Text style={styles.forgot}>¿Has olvidado tu contraseña?</Text>
                                 </TouchableOpacity>
@@ -205,7 +209,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 30, paddingTop: 50, alignItems: 'center', justifyContent: 'center' },
+    container: { padding: 30, paddingTop: 10, alignItems: 'center', justifyContent: 'center' },
     logo: { fontSize: 70, fontWeight: 'bold', color: '#00a6a6', marginBottom: 30 },
     card: {
         width: '100%', maxWidth: 400, backgroundColor: '#fff',

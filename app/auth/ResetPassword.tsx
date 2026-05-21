@@ -137,7 +137,6 @@ const ResetPassword = () => {
 export default ResetPassword
 
 const styles = StyleSheet.create({
-    safe: { flex: 1, backgroundColor: '#f8fafc' },
     container: { padding: 30, paddingTop: 50, alignItems: 'center', justifyContent: 'center' },
     instructivosContainer: { alignSelf: 'flex-start', marginBottom: 25, width: '100%' },
 })

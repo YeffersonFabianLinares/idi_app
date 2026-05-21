@@ -245,7 +245,7 @@ const FormAppoinment = () => {
                     onConfirm={() => handleConfirmExit()}
                     title='Confirmación'
                     message='¿Estás seguro de que quieres salir?' />
-                    <Button title='1' onPress={() => setIsModalFinishVisible(true)}></Button>
+                {/* <Button title='1' onPress={() => setIsModalFinishVisible(true)}></Button> */}
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={headerHeight + 20}>
                     <LoadingModal visible={loading} />
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -277,7 +277,6 @@ const FormAppoinment = () => {
                                     </View>
                                     {post_mortem &&
                                         <View style={{
-                                            flex: 1,
                                             justifyContent: 'center',
                                             alignItems: 'center'
                                         }}>
@@ -312,7 +311,6 @@ const FormAppoinment = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#f8fafc',
         padding: 25,
         borderRadius: 20,
         alignItems: 'center',

@@ -7,7 +7,7 @@ const api = axios.create({
     baseURL: process.env.EXPO_PUBLIC_API_URL,
     // baseURL: 'http://10.2.3.160:8000/api',
     // baseURL: 'http://192.168.73.74:8080/api',
-    timeout: 10000
+    timeout: 90000
 })
 
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
@@ -48,13 +48,13 @@ api.interceptors.response.use(
         }
 
         // ERR_NETWORK ocurre cuando el servidor IIS está apagado o Reverb no responde
-        if (error.code === 'ERR_NETWORK' || !error.response) {
-            Toast.show({
-                type: 'error',
-                text1: 'Servidor no disponible',
-                text2: 'Estamos experimentando problemas técnicos. Inténtalo más tarde.'
-            })
-        }
+        // if (error.code === 'ERR_NETWORK' || !error.response) {
+        //     Toast.show({
+        //         type: 'error',
+        //         text1: 'Servidor no disponible',
+        //         text2: 'Estamos experimentando problemas técnicos. Inténtalo más tarde.'
+        //     })
+        // }
 
         return Promise.reject(error);
     }

@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
   },
   textRow: {
     flexDirection: 'row',

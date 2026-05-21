@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['bottom']}>
             {/* Logo y Nombre */}
             <View style={styles.brandContainer}>
                 <View style={styles.iconPlaceholder}>
@@ -29,7 +30,7 @@ const Footer = () => {
                     <Text style={styles.linkText}>Política de Privacidad</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -37,9 +38,9 @@ const styles = StyleSheet.create({
     container: {
         borderColor: '#00000013',
         borderWidth: .5,
-        paddingVertical: 20,
+        paddingTop: 10,
         alignItems: 'center',
-        backgroundColor: '#f8f9fa', // Color de fondo claro
+        backgroundColor: '#f8fafc', // Color de fondo claro
         width: '100%',
     },
     brandContainer: {

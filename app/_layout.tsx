@@ -95,7 +95,7 @@ function RootLayoutNav() {
           config={toastConfig}
           topOffset={60} />
       </ThemeProvider>
-      <Footer></Footer>
+      <Footer />
     </SafeAreaProvider>
   );
 }

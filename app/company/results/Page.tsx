@@ -1,13 +1,15 @@
 import { LoadingModal } from '@/components/LoadingModal';
+import NoResult from '@/components/NoResult';
 import PatientCardInfo from '@/components/PatientCardInfo';
 import { IResult } from '@/interfaces/IResult';
 import { downloadResultPdf, getDeliveryResults } from '@/services/deliveryResults.service';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { globalStyles } from '@/styles/style';
+import { Feather } from '@expo/vector-icons';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn, FadeInRight } from 'react-native-reanimated';
+import Animated, { FadeInRight } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
 /**
@@ -99,8 +101,8 @@ const PatientDashboard = () => {
      *   según la disponibilidad del resultado (Completo/Pendiente).
      */
     return (
-        <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.content}>
+        <View style={globalStyles.container}>
+            <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                 <PatientCardInfo />
                 <LoadingModal visible={loading} />
                 <View>
@@ -144,33 +146,7 @@ const PatientDashboard = () => {
                             </Animated.View>
                         ))
                         :
-                        <Animated.View entering={FadeIn.duration(800)} style={styles.container}>
-                            <MaterialCommunityIcons name="file-search-outline" size={100} color="#cbd5e1" />
-
-                            <View style={styles.card}>
-                                <View style={styles.row}>
-                                    <View style={styles.dot} />
-                                    <Text style={styles.text}>Nuestro sistema no registra ningún resultado para ti.</Text>
-                                </View>
-
-                                <View style={styles.row}>
-                                    <View style={styles.dot} />
-                                    <Text style={styles.text}>
-                                        Si consideras que hay un error, te invitamos a ponerte en contacto con la sede más cercana.
-                                    </Text>
-                                </View>
-
-                                <View style={styles.row}>
-                                    <View style={styles.dot} />
-                                    <TouchableOpacity onPress={abrirWeb}>
-                                        <Text style={styles.text}>
-                                            Consulta nuestros teléfonos y sedes en
-                                            <Text style={styles.link}> www.idime.com.co</Text>
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </Animated.View>
+                        <NoResult />
                 }
             </ScrollView>
         </View>
@@ -198,9 +174,7 @@ const ExamItem = ({ title, status, color }: ExamenItemProps) => (
 );
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F8FAFC' },
     avatarCircle: { width: 35, height: 35, borderRadius: 17, backgroundColor: '#444', justifyContent: 'center', alignItems: 'center' },
-    content: { padding: 20 },
     title_label: { fontSize: 15, color: '#64748B', fontWeight: 'bold', marginBottom: 15, marginTop: 10 },
     statusBadge: {
         backgroundColor: '#065F46',

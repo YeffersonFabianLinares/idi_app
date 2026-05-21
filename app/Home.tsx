@@ -3,6 +3,7 @@ import logoImgDiagnostico from '@/assets/images/main-header.webp';
 import MenuGeneral from '@/components/MenuGeneral';
 import { MenuMain } from '@/components/MenuMain';
 import { Menu } from '@/interfaces/Menu';
+import { globalStyles } from '@/styles/style';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 /**
@@ -36,7 +37,7 @@ export const Home = () => {
      * - Abstracción: Delega la lógica de renderizado de los botones al componente especializado MenuGeneral.
      */
     return (
-        <View style={styles.container}>
+        <View style={globalStyles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
 
                 <Text style={styles.headerTitle}>Ingresa <Text style={{ fontWeight: '300' }}>a tu portal</Text></Text>
@@ -56,7 +57,6 @@ export const Home = () => {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
     scroll: { paddingBottom: 40 },
     headerTitle: {
         fontSize: 28,

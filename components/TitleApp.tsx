@@ -22,7 +22,7 @@ const TitleApp = ({ title1, title2 }: TitleAppProps) => {
 export default TitleApp
 
 const styles = StyleSheet.create({
-    titleSection: { marginBottom: 30 },
+    titleSection: { marginBottom: 15 },
     title: { fontSize: 32, color: '#334155', lineHeight: 38 },
     orangeLine: { width: 50, height: 4, backgroundColor: '#ff9900', marginTop: 8 },
 })

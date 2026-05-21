@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HeaderProps {
     title: string
@@ -24,22 +24,18 @@ const Header = ({ title, canGoBack, onBackPress }: HeaderProps) => {
     };
 
     return (
-        <View style={[styles.header, {
-            paddingTop: insets.top,
-            height: 60 + insets.top
-        }]}>
+        <SafeAreaView style={[styles.header]} edges={['top', 'left']}>
             {
                 canGoBack && (
                     <TouchableOpacity
                         onPress={handleBack}
-                        style={{ padding: 10, marginLeft: -10 }}
                     >
                         <Feather name="arrow-left" color="#FFF" size={20} />
                     </TouchableOpacity>
                 )
             }
             <Text style={styles.headerTitle}>{title}</Text>
-        </View>
+        </SafeAreaView>
     )
 }
 
@@ -51,7 +47,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 20
+        padding: 20,
     },
     headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
 })

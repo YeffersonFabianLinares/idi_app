@@ -61,7 +61,7 @@ export const useAsyncFormHandler = () => {
     });
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 31000);
 
     /**
  * Ejecuta una función asíncrona y gestiona automáticamente sus estados y errores.

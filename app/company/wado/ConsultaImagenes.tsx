@@ -101,7 +101,7 @@ export default function ConsultaImagenes() {
                     style={{ flex: 1 }}
                 >
                     <LoadingModal visible={isLoading} />
-                    <ScrollView contentContainerStyle={styles.container}>
+                    <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                         <TitleApp
                             title1='Consulta tus'
                             title2='imágenes'
@@ -128,8 +128,14 @@ export default function ConsultaImagenes() {
                                 />
                             </View>
 
-                            <Button title='Consultar'
-                                onPress={methods.handleSubmit(onSubmit)} disabled={isLoading} />
+                            <View style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                justifyContent: 'center'
+                            }}>
+                                <Button title='Consultar'
+                                    onPress={methods.handleSubmit(onSubmit)} disabled={isLoading} />
+                            </View>
 
                             <View>
                                 {enlace ? (

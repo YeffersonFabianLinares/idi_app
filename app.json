@@ -4,7 +4,7 @@
     "slug": "idime-entrega-resultados",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "idimeentregaresultados",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -22,7 +22,8 @@
         "backgroundColor": "#00A6A6"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "idime.com"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f66c51aa-2ab4-431e-bdf3-a02c36484473"
+      }
     }
   }
 }

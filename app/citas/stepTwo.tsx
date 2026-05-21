@@ -34,7 +34,7 @@ interface StepTwoProps {
 const StepTwo = ({ onNext, stepFields, setLoading }: StepTwoProps) => {
 
     /** Acceso al estado global del formulario. */
-    const { getValues, trigger } = useFormContext()
+    const { getValues, trigger, setValue } = useFormContext()
 
     const optionsSex = [
         { label: 'Femenino', value: 'F' },

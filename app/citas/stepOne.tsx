@@ -53,8 +53,6 @@ const StepOne = ({ dependences, setLoading, onNext, stepFields }: StepOneProps) 
      * 4. Al finalizar, invoca 'onNext' para avanzar al Paso 2.
      */
     const handlePress = async () => {
-        console.log('111');
-        
         const allValues = getValues();
         const fieldNames = [...stepFields, 'id_menbot'];
 
@@ -71,7 +69,8 @@ const StepOne = ({ dependences, setLoading, onNext, stepFields }: StepOneProps) 
             )
             if (response.alertSeverity === 'success') {
                 if (response?.response?.data) {
-                    const dataResponse = response.response.data
+                    // @ts-ignore
+                    const dataResponse = response.response.data?.data
                     Object.keys(dataResponse).forEach((key) => {
                         // @ts-ignore
                         let value = dataResponse[key];

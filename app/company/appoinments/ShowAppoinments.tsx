@@ -16,6 +16,7 @@ import Toast from 'react-native-toast-message';
 export default function ShowAppoinments() {
 
     const [appoinemnts, setAppoinments] = useState<any[]>([])
+    const [loading, setLoading] = useState<boolean>(false)
     const { execute, isLoading } = useAsyncFormHandler()
 
     const [isVisible, setModalVisible] = useState(false);
@@ -48,6 +49,7 @@ export default function ShowAppoinments() {
 
     const downloadPreparations = async (data: any) => {
         try {
+            setLoading(true)
             const response = await generatePreparations(data)
 
             if (response.byteLength === 0) {
@@ -68,6 +70,8 @@ export default function ShowAppoinments() {
                 text1: 'Idime',
                 text2: 'Ocurrió un fallo al descargar el archivo, por favor intente más tarde'
             })
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -78,7 +82,7 @@ export default function ShowAppoinments() {
     return (
         <View style={globalStyles.container}>
             <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-                <LoadingModal visible={isLoading} />
+                <LoadingModal visible={isLoading || loading} />
                 <ModalConfirm
                     isVisible={isVisible}
                     onClose={() => setModalVisible(false)}
