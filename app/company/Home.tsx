@@ -5,21 +5,20 @@ import PatientCardInfo from '@/components/PatientCardInfo';
 import { Menu } from '@/interfaces/Menu';
 import { globalStyles } from '@/styles/style';
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ServiciosPortal() {
 
     const options: Menu[] = MenuCompany
 
     return (
-        <View style={globalStyles.container}>
-            <ScrollView contentContainerStyle={styles.scroll}>
-                <View style={styles.header}>
-                </View>
+        <SafeAreaView style={globalStyles.container} edges={['bottom']}>
+            <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                 <PatientCardInfo />
                 <MenuGeneral options={options} />
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
 

@@ -17,6 +17,7 @@ import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 /**
@@ -48,6 +49,7 @@ export default function LoginScreen() {
     const methods = useForm<AuthSchema>({
         resolver: zodResolver(authSchema)
     })
+
 
     /**
      * Hook personalizado para manejar el envío asíncrono.
@@ -121,11 +123,11 @@ export default function LoginScreen() {
     * para evitar que el teclado oculte los inputs en iOS/Android.
     */
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <FormProvider {...methods}>
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={headerHeight + 20}>
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <ScrollView contentContainerStyle={styles.container}>
+                        <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                             <LoadingModal visible={isLoading} />
                             <Animated.View entering={FadeIn.delay(500)} style={styles.instructivosContainer}>
                                 <TitleApp
@@ -204,7 +206,7 @@ export default function LoginScreen() {
                     </TouchableWithoutFeedback>
                 </KeyboardAvoidingView>
             </FormProvider>
-        </View>
+        </SafeAreaView>
     );
 }
 

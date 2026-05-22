@@ -11,6 +11,7 @@ import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 export default function ShowAppoinments() {
@@ -80,7 +81,7 @@ export default function ShowAppoinments() {
     }, [])
 
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container} edges={['bottom']}>
             <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                 <LoadingModal visible={isLoading || loading} />
                 <ModalConfirm
@@ -149,7 +150,7 @@ export default function ShowAppoinments() {
                         <NoResult />
                 }
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
 

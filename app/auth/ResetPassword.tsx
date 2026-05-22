@@ -13,6 +13,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from 'react-native-reanimated';
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 /**
@@ -75,7 +76,7 @@ const ResetPassword = () => {
         router.dismissAll()
         router.push({
             pathname: '/auth/Login',
-            params: { tipo: 'Paciente' }
+            params: { type: 'Paciente' }
         })
 
     }
@@ -86,10 +87,10 @@ const ResetPassword = () => {
      * - Los inputs incluyen iconos interactivos (MaterialCommunityIcons) para la visualización del texto.
     */
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <FormProvider {...methods}>
                 <LoadingModal visible={isLoading} />
-                <ScrollView contentContainerStyle={styles.container}>
+                <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                     <Animated.View entering={FadeIn.delay(500)} style={styles.instructivosContainer}>
                         <TitleApp
                             title1="Nueva"
@@ -130,7 +131,7 @@ const ResetPassword = () => {
                     </Animated.View>
                 </ScrollView>
             </FormProvider>
-        </View>
+        </SafeAreaView>
     )
 }
 

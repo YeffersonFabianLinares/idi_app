@@ -21,32 +21,29 @@ const MenuGeneral = ({ options }: MenuGeneralProps) => {
     }
 
     return (
-        <>
-            <View style={styles.menuContainer}>
-                {options.map((item, index) => (
-                    <Animated.View
-                        key={index}
-                        entering={FadeInUp.delay(200 * index).springify()}
-                    >
-                        <TouchableOpacity style={styles.optionButton} activeOpacity={0.7} onPress={() => redirect(item.link, item.type)}>
-                            <View style={styles.iconCircle}>
-                                {item.icon}
-                            </View>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.optionTitle}>{item.title}</Text>
-                                <Text style={styles.optionSub}>{item.subtitle}</Text>
-                            </View>
-                            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-                        </TouchableOpacity>
-                    </Animated.View>
-                ))}
-            </View>
-        </>
+        <View>
+            {options.map((item, index) => (
+                <Animated.View
+                    key={index}
+                    entering={FadeInUp.delay(200 * index).springify()}
+                >
+                    <TouchableOpacity style={styles.optionButton} activeOpacity={0.7} onPress={() => redirect(item.link, item.type)}>
+                        <View style={styles.iconCircle}>
+                            {item.icon}
+                        </View>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.optionTitle}>{item.title}</Text>
+                            <Text style={styles.optionSub}>{item.subtitle}</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="#ccc" />
+                    </TouchableOpacity>
+                </Animated.View>
+            ))}
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
-    menuContainer: { paddingHorizontal: 20 },
     optionButton: {
         flexDirection: 'row',
         alignItems: 'center',

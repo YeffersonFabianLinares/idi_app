@@ -10,6 +10,7 @@ import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 /**
@@ -101,7 +102,7 @@ const PatientDashboard = () => {
      *   según la disponibilidad del resultado (Completo/Pendiente).
      */
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container} edges={['bottom']}>
             <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
                 <PatientCardInfo />
                 <LoadingModal visible={loading} />
@@ -149,7 +150,7 @@ const PatientDashboard = () => {
                         <NoResult />
                 }
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 

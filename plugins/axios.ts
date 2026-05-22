@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import Toast from "react-native-toast-message";
 const api = axios.create({
     baseURL: process.env.EXPO_PUBLIC_API_URL,
-    // baseURL: 'http://10.2.3.160:8000/api',
+    // baseURL: 'http://xxx.2.3.160:8000/api',
     // baseURL: 'http://192.168.73.74:8080/api',
     timeout: 90000
 })

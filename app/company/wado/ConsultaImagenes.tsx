@@ -19,6 +19,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 /**
@@ -94,7 +95,7 @@ export default function ConsultaImagenes() {
      * - Utiliza KeyboardAvoidingView para asegurar que el botón 'Consultar' sea siempre accesible.
      */
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <FormProvider {...methods}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -172,7 +173,7 @@ export default function ConsultaImagenes() {
                     </ScrollView>
                 </KeyboardAvoidingView>
             </FormProvider>
-        </View>
+        </SafeAreaView>
     );
 }
 

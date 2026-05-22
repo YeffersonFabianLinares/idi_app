@@ -6,13 +6,13 @@ import {
   ActivityIndicator,
   FlatList, Modal,
   Platform,
-  SafeAreaView,
   StyleSheet,
   Text, TextInput,
   TextInputProps,
   TouchableOpacity,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ErrorMessage from '../ErrorMessage';
 
 // Definimos la interfaz para los items y las props
@@ -98,7 +98,7 @@ const Select2Paginado: React.FC<Select2Props> = ({
     const delayDebounceFn = setTimeout(() => {
       setPage(1);
       loadOptions(search, 1);
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(delayDebounceFn);
   }, [search, visible, extraParams]);

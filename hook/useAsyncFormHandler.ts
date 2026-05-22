@@ -1,6 +1,7 @@
 import type { AlertSeverity } from '@/types/AlertSeverity';
 import { AxiosError } from 'axios';
 import { useCallback, useState } from 'react';
+import Toast from 'react-native-toast-message';
 
 /**
  * Estructura de parámetros necesarios para enviar petición store o update a API
@@ -120,6 +121,12 @@ export const useAsyncFormHandler = () => {
             } else if (axiosError.request) {
                 finalErrorMessage = 'Error de red: No se pudo conectar con el servidor.';
             }
+
+            Toast.show({
+                type: 'error',
+                text1: 'Idime',
+                text2: finalErrorMessage
+            })
 
             setState({
                 isLoading: false,

@@ -136,15 +136,13 @@ const stepThree = ({ dependences, onNext, stepFields, type, setLoading }: StepTh
                 {
                     busExam && (
                         <View style={globalStyles.inputGroup}>
-                            <View style={globalStyles.inputGroup}>
-                                <Select2Paginado
-                                    label={`Escriba el ${busExam === 'C' ? 'código' : 'Nombre'} del examen a tomar`}
-                                    name="cod_examen"
-                                    endpoint={`${api.defaults.baseURL}/exams`}
-                                    autoCorrect={false}
-                                    extraParams={{ cod_empresa: cod_empresa, busExam: busExam, cod_area: cod_area }}
-                                />
-                            </View>
+                            <Select2Paginado
+                                label={`Escriba el ${busExam === 'C' ? 'código' : 'Nombre'} del examen a tomar`}
+                                name="cod_examen"
+                                endpoint={`${api.defaults.baseURL}/exams`}
+                                autoCorrect={false}
+                                extraParams={{ cod_empresa: cod_empresa, busExam: busExam, cod_area: cod_area }}
+                            />
                         </View>)
                 }
                 <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row' }}>

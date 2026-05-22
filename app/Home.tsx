@@ -6,6 +6,7 @@ import { Menu } from '@/interfaces/Menu';
 import { globalStyles } from '@/styles/style';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 /**
  * Pantalla Principal (Dashboard).
  * 
@@ -37,7 +38,7 @@ export const Home = () => {
      * - Abstracción: Delega la lógica de renderizado de los botones al componente especializado MenuGeneral.
      */
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container} edges={['bottom']}>
             <ScrollView contentContainerStyle={styles.scroll}>
 
                 <Text style={styles.headerTitle}>Ingresa <Text style={{ fontWeight: '300' }}>a tu portal</Text></Text>
@@ -49,10 +50,13 @@ export const Home = () => {
                         resizeMode="cover"
                     />
                 </View>
-
-                <MenuGeneral options={options} />
+                <View style={{
+                    paddingHorizontal: 20
+                }}>
+                    <MenuGeneral options={options} />
+                </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
 

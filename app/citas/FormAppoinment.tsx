@@ -44,7 +44,7 @@ const FormAppoinment = () => {
      * Control del flujo del Wizard.
      * @state currentStep {number} - Paso actual del 1 al 4.
      */
-    const [currentStep, setCurrentStep] = useState(3);
+    const [currentStep, setCurrentStep] = useState(1);
     const [dependences, setDependences] = useState<IDependencesAppoinemnts>({ areas: [], types_documents: [], departments: [] });
     const [loading, setLoading] = useState<boolean>(false)
     const navigation = useNavigation();
@@ -187,8 +187,15 @@ const FormAppoinment = () => {
             try {
                 setLoading(true)
                 const response = await execute(() => dependencesAppoinments(type))
-
-                setDependences(response.response?.data);
+                if(response.alertSeverity === 'success')
+                    setDependences(response.response?.data);
+                else {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Idime',
+                        text2: response.message
+                    })
+                }
             } catch (error) {
                 console.error('error ==> ', error);
             } finally {
@@ -231,7 +238,7 @@ const FormAppoinment = () => {
      * - Display Control: Utiliza 'display: none' para persistir el estado de los componentes ocultos sin desmontarlos.
      */
     return (
-        <SafeAreaView style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container} edges={['bottom']}>
             {
                 Platform.OS === 'ios' &&
                 <Stack.Screen options={{
