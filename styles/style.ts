@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const globalStyles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f8fafc' },
-    scrollContainer: { paddingHorizontal: 20, marginTop: 20 },
+    scrollContainer: { paddingHorizontal: 20 },
     inputGroup: { marginBottom: 15 },
     label: {
         fontSize: 14,
@@ -28,6 +28,7 @@ export const globalStyles = StyleSheet.create({
         paddingHorizontal: 12,
         height: 50,
         backgroundColor: '#f9fafb',
+        color: '#000',
         fontSize: 15,
     },
     inputWithIcon: {

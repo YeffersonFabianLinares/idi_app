@@ -6,7 +6,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { useColorScheme } from '@/components/useColorScheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -88,14 +87,14 @@ function RootLayoutNav() {
                   onBackPress={customBack}
                 />
               )
-            },
+            }
           }}>
         </Stack>
         <Toast
           config={toastConfig}
           topOffset={60} />
       </ThemeProvider>
-      <Footer />
+      {/* <Footer /> */}
     </SafeAreaProvider>
   );
 }

@@ -103,51 +103,53 @@ const stepThree = ({ dependences, onNext, stepFields, type, setLoading }: StepTh
     return (
         <Animated.View entering={FadeInRight}>
             <View>
-                <Select
-                    label="Seleccione el departamento dónde tomará el examen"
-                    name="cod_depto"
-                    placeholder="Departamento"
-                    options={dependences.departments}
-                />
-            </View>
-            {cod_depto &&
                 <View>
-                    <Select2Paginado
-                        label="Entidad"
-                        name="cod_empresa"
-                        endpoint={`${api.defaults.baseURL}/entities`}
-                        placeholder="Entidad"
-                        autoCorrect={false}
-                        extraParams={{ cod_depto: cod_depto, type: type }}
+                    <Select
+                        label="Seleccione el departamento dónde tomará el examen"
+                        name="cod_depto"
+                        placeholder="Departamento"
+                        options={dependences.departments}
                     />
                 </View>
-            }
-            {
-                cod_empresa &&
-                <View>
-                    <RadioButton
-                        label="Buscar examen por"
-                        name="busExam"
-                        options={optionsExam}
-                    />
-                </View>
-            }
-            {
-                busExam && (
-                    <View style={globalStyles.inputGroup}>
+                {cod_depto &&
+                    <View>
+                        <Select2Paginado
+                            label="Entidad"
+                            name="cod_empresa"
+                            endpoint={`${api.defaults.baseURL}/entities`}
+                            placeholder="Entidad"
+                            autoCorrect={false}
+                            extraParams={{ cod_depto: cod_depto, type: type }}
+                        />
+                    </View>
+                }
+                {
+                    cod_empresa &&
+                    <View>
+                        <RadioButton
+                            label="Buscar examen por"
+                            name="busExam"
+                            options={optionsExam}
+                        />
+                    </View>
+                }
+                {
+                    busExam && (
                         <View style={globalStyles.inputGroup}>
-                            <Select2Paginado
-                                label={`Escriba el ${busExam === 'C' ? 'código' : 'Nombre'} del examen a tomar`}
-                                name="cod_examen"
-                                endpoint={`${api.defaults.baseURL}/exams`}
-                                autoCorrect={false}
-                                extraParams={{ cod_empresa: cod_empresa, busExam: busExam, cod_area: cod_area }}
-                            />
-                        </View>
-                    </View>)
-            }
-            <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row' }}>
-                <Button title='Continuar' onPress={handlePress} />
+                            <View style={globalStyles.inputGroup}>
+                                <Select2Paginado
+                                    label={`Escriba el ${busExam === 'C' ? 'código' : 'Nombre'} del examen a tomar`}
+                                    name="cod_examen"
+                                    endpoint={`${api.defaults.baseURL}/exams`}
+                                    autoCorrect={false}
+                                    extraParams={{ cod_empresa: cod_empresa, busExam: busExam, cod_area: cod_area }}
+                                />
+                            </View>
+                        </View>)
+                }
+                <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row' }}>
+                    <Button title='Continuar' onPress={handlePress} />
+                </View>
             </View>
         </Animated.View>
     )

@@ -4,8 +4,7 @@ import { Select } from '@/components/form/Select';
 import { LoadingModal } from '@/components/LoadingModal';
 import { useAsyncFormHandler } from '@/hook/useAsyncFormHandler';
 import { getDependencesStepFour, searchAppoinmentDisponibily } from '@/services/appoinment.service';
-import { globalStyles } from '@/styles/style';
-import { Calendar, ChevronDown, Clock, MapPin } from 'lucide-react-native';
+import { Calendar, Clock, MapPin } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -152,7 +151,7 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
      *   con un borde y un indicador naranja.
      */
     return (
-        <Animated.View entering={FadeInRight} style={globalStyles.container}>
+        <Animated.View entering={FadeInRight}>
             <View style={styles.scrollContent}>
                 {/* Card Informativo Superior */}
                 <View style={styles.infoCard}>
@@ -265,20 +264,20 @@ const StepFour = ({ stepFields, onFinish }: StepFourProps) => {
                         </View>
                     </View>
                 }
-                <TouchableOpacity
+                {/* <TouchableOpacity
                     style={styles.floatingButton}
                     onPress={scrollToBottom}
                     activeOpacity={0.8}
                 >
                     <ChevronDown color="white" size={30} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         </Animated.View >
     );
 };
 
 const styles = StyleSheet.create({
-    scrollContent: { padding: 20 },
+    scrollContent: { },
     // Estilos Card Informativo
     infoCard: {
         backgroundColor: 'white',

@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Modal from 'react-native-modal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import StepFour from './stepFour';
 import StepOne from './stepOne';
@@ -43,7 +44,7 @@ const FormAppoinment = () => {
      * Control del flujo del Wizard.
      * @state currentStep {number} - Paso actual del 1 al 4.
      */
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(3);
     const [dependences, setDependences] = useState<IDependencesAppoinemnts>({ areas: [], types_documents: [], departments: [] });
     const [loading, setLoading] = useState<boolean>(false)
     const navigation = useNavigation();
@@ -230,7 +231,7 @@ const FormAppoinment = () => {
      * - Display Control: Utiliza 'display: none' para persistir el estado de los componentes ocultos sin desmontarlos.
      */
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container}>
             {
                 Platform.OS === 'ios' &&
                 <Stack.Screen options={{
@@ -305,12 +306,13 @@ const FormAppoinment = () => {
                     </TouchableWithoutFeedback>
                 </KeyboardAvoidingView>
             </FormProvider>
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: '#f8fafc',
         padding: 25,
         borderRadius: 20,
         alignItems: 'center',
