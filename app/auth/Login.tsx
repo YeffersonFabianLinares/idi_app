@@ -102,7 +102,7 @@ export default function LoginScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Idime',
-                text2: 'Credenciales incorrectas'
+                text2: response.message
             })
         }
     }

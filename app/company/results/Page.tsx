@@ -6,9 +6,11 @@ import { downloadResultPdf, getDeliveryResults } from '@/services/deliveryResult
 import { globalStyles } from '@/styles/style';
 import { Feather } from '@expo/vector-icons';
 import { File, Paths } from 'expo-file-system';
+import * as FileSystemLegacy from 'expo-file-system/legacy';
+import * as IntentLauncher from 'expo-intent-launcher';
 import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -37,10 +39,6 @@ const PatientDashboard = () => {
     const [dataApi, setDataApi] = useState<IResult | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
 
-    const abrirWeb = () => {
-        Linking.openURL('https://idime.com.co/');
-    };
-
     /**
      * Orquestador de descarga de resultados.
      * 
@@ -61,9 +59,19 @@ const PatientDashboard = () => {
             const archivo = new File(Paths.cache, `resultado_${ordinal}.pdf`);
             const pdfData = new Uint8Array(response);
             await archivo.write(pdfData);
-            if (await Sharing.isAvailableAsync()) {
+            if (Platform.OS === 'android') {
+                const contentUri = await FileSystemLegacy.getContentUriAsync(archivo.uri);
+
+                await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+                    data: contentUri,
+                    flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+                    type: 'application/pdf',
+                });
+            } else if (await Sharing.isAvailableAsync()) {
                 await Sharing.shareAsync(archivo.uri, {
                     mimeType: 'application/pdf',
+                    UTI: 'com.adobe.pdf',
+                    dialogTitle: 'Vista previa del resultado'
                 });
             }
         } catch (error) {
@@ -109,7 +117,6 @@ const PatientDashboard = () => {
                 <View>
                     <Text style={styles.title_label}>RESULTADOS DE EXÁMENES</Text>
                 </View>
-
                 {
                     (dataApi?.data && dataApi?.data.length > 0) ?
                         dataApi?.data.map((result, index) => (

@@ -8,11 +8,14 @@ import { globalStyles } from '@/styles/style';
 import { getStatusName } from '@/utils/helpers';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // O usa react-native-vector-icons
 import { File, Paths } from 'expo-file-system';
+import * as FileSystemLegacy from 'expo-file-system/legacy';
+import * as IntentLauncher from 'expo-intent-launcher';
 import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+
 
 export default function ShowAppoinments() {
 
@@ -50,22 +53,34 @@ export default function ShowAppoinments() {
 
     const downloadPreparations = async (data: any) => {
         try {
-            setLoading(true)
-            const response = await generatePreparations(data)
+                    setLoading(true);
+        const response = await generatePreparations(data);
 
-            if (response.byteLength === 0) {
-                throw new Error("El archivo recibido está vacío.");
-            }
+        if (!response || response.byteLength === 0) throw new Error("Vacío");
 
-            const archivo = new File(Paths.cache, `resultado_${data.ordinal}.pdf`);
-            const pdfData = new Uint8Array(response);
-            await archivo.write(pdfData);
-            if (await Sharing.isAvailableAsync()) {
-                await Sharing.shareAsync(archivo.uri, {
-                    mimeType: 'application/pdf',
-                });
-            }
+        const fileName = `preparacion_${data.ordinal}.pdf`;
+        const archivo = new File(Paths.cache, fileName);
+        await archivo.write(new Uint8Array(response));
+
+        if (Platform.OS === 'android') {
+            // Usamos la API legacy que es la que realmente tiene el método funcional
+            const contentUri = await FileSystemLegacy.getContentUriAsync(archivo.uri);
+
+            await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+                data: contentUri,
+                flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+                type: 'application/pdf',
+            });
+        } else {
+            // En iOS abrimos el menú de compartir/preview
+            await Sharing.shareAsync(archivo.uri, {
+                mimeType: 'application/pdf',
+                UTI: 'com.adobe.pdf',
+            });
+        }
         } catch (error) {
+            console.log('error ==> ', error);
+
             Toast.show({
                 type: 'error',
                 text1: 'Idime',
@@ -101,7 +116,7 @@ export default function ShowAppoinments() {
                                 {appoinemnts.map((item, index) => (
                                     <View style={styles.card} key={index}>
                                         <View style={styles.header}>
-                                            <View style={{maxWidth: '80%'}}>
+                                            <View style={{ maxWidth: '80%' }}>
                                                 <Text style={styles.titleText} numberOfLines={2}>{item.examen.nombre}</Text>
                                             </View>
                                             <View style={[styles.badge, { backgroundColor: item.estado === 'AC' ? '#E0F7F9' : '#F5F5F5' }]}>
