@@ -35,12 +35,7 @@ export default function SolicitaCita() {
             logo: logoImgDemanda,
             link: '/citas/FormAppoinment',
             type: 'demanda'
-        },
-        // {
-        //     description: 'Si requieres otra especialidad y/o vienes remitido de algún asegurador (EPS), da clic sobre esta imagen.',
-        //     logo: logoImgDiagnostico,
-        //     link: '/citas/formSpeciality/Page'
-        // },
+        }
     ];
 
     const agendarCita = (link: routesAppoinments, type: string | undefined) => {

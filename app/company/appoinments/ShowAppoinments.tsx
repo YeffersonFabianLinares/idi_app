@@ -16,7 +16,14 @@ import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-
+/**
+ * Componente de pantalla para la gestión y visualización de citas médicas del paciente.
+ * 
+ * Permite listar las citas activas, visualizar detalles de sede/examen, descargar 
+ * preparaciones médicas en formato PDF (con soporte multiplataforma) y realizar 
+ * cancelaciones interactivas mediante un flujo con modal de confirmación.
+ * 
+ */
 export default function ShowAppoinments() {
 
     const [appoinemnts, setAppoinments] = useState<any[]>([])
@@ -26,16 +33,34 @@ export default function ShowAppoinments() {
     const [isVisible, setModalVisible] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
 
+    /**
+     * Consulta las citas médicas vigentes del paciente en la base de datos Oracle
+     * a través del servicio correspondiente y actualiza el estado local.
+     * @async
+     * @returns {Promise<void>}
+     */
     const getAppoinmentsByPatientFn = async () => {
         const response = await getAppoinmentsByPatient()
         setAppoinments(response)
     }
 
+    /**
+     * Prepara el flujo de cancelación de una cita médica. 
+     * Almacena los datos de la cita y despliega el modal de confirmación en pantalla.
+     * @param {any} data Objeto completo de la cita o identificador estructurado.
+     */
     const handleCancelAppoinment = async (data: any) => {
         setModalVisible(true)
         setSelectedAppointment(data)
     }
 
+    /**
+     * Procesa la confirmación de la cancelación.
+     * Ejecuta el servicio HTTP de anulación bajo el estado seguro del hook,
+     * muestra un Toast informativo según la severidad de la respuesta, refresca la lista y cierra el modal.
+     * @async
+     * @returns {Promise<void>}
+     */
     const onConfirm = async () => {
         const response = await execute(
             () => cancelAppoinment(selectedAppointment)
@@ -51,36 +76,47 @@ export default function ShowAppoinments() {
         setModalVisible(false)
     }
 
+    /**
+     * Descarga y procesa las guías de preparación médica asociadas a la cita.
+     * Recupera el binario (ArrayBuffer/Blob), genera un archivo físico temporal en el caché 
+     * del dispositivo y lo lanza visualmente según el sistema operativo del teléfono.
+     * 
+     * - **Android**: Resuelve la URI mediante `ContentProvider` heredado para lanzar un Intent nativo de PDF.
+     * - **iOS**: Abre la hoja nativa de compartir (`UIActivityViewController`) para previsualizar el archivo.
+     * 
+     * @async
+     * @param {any} data Datos de la cita requeridos para la consulta (debe contener `.ordinal`).
+     * @throws {Error} Si la respuesta del servidor es nula o vacía.
+     * @returns {Promise<void>}
+     */
     const downloadPreparations = async (data: any) => {
         try {
-                    setLoading(true);
-        const response = await generatePreparations(data);
+            setLoading(true);
+            const response = await generatePreparations(data);
 
-        if (!response || response.byteLength === 0) throw new Error("Vacío");
+            if (!response || response.byteLength === 0) throw new Error("Vacío");
 
-        const fileName = `preparacion_${data.ordinal}.pdf`;
-        const archivo = new File(Paths.cache, fileName);
-        await archivo.write(new Uint8Array(response));
+            const fileName = `preparacion_${data.ordinal}.pdf`;
+            const archivo = new File(Paths.cache, fileName);
+            await archivo.write(new Uint8Array(response));
 
-        if (Platform.OS === 'android') {
-            // Usamos la API legacy que es la que realmente tiene el método funcional
-            const contentUri = await FileSystemLegacy.getContentUriAsync(archivo.uri);
+            if (Platform.OS === 'android') {
+                // Usamos la API legacy que es la que realmente tiene el método funcional
+                const contentUri = await FileSystemLegacy.getContentUriAsync(archivo.uri);
 
-            await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-                data: contentUri,
-                flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-                type: 'application/pdf',
-            });
-        } else {
-            // En iOS abrimos el menú de compartir/preview
-            await Sharing.shareAsync(archivo.uri, {
-                mimeType: 'application/pdf',
-                UTI: 'com.adobe.pdf',
-            });
-        }
+                await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+                    data: contentUri,
+                    flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+                    type: 'application/pdf',
+                });
+            } else {
+                // En iOS abrimos el menú de compartir/preview
+                await Sharing.shareAsync(archivo.uri, {
+                    mimeType: 'application/pdf',
+                    UTI: 'com.adobe.pdf',
+                });
+            }
         } catch (error) {
-            console.log('error ==> ', error);
-
             Toast.show({
                 type: 'error',
                 text1: 'Idime',

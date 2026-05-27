@@ -120,7 +120,6 @@ const FormAppoinment = () => {
     }
 
     const onSubmit = async (data: IAppoinment) => {
-        console.log('here11');
         setLoading(false)
 
         const response = await execute(() => appoinmentPrepareReserved(data))
@@ -129,14 +128,10 @@ const FormAppoinment = () => {
             text1: 'Idime',
             text2: response.message
         })
-        console.log('response.alertSeverity ==> ', response.alertSeverity);
 
         if (response.alertSeverity === 'success') {
             SetIsSaved(true)
-            console.log('here');
             setIsModalFinishVisible(true)
-            console.log('isModalFinishVisible ==> ', isModalFinishVisible);
-
         }
     }
 
