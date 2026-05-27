@@ -134,6 +134,7 @@ const StepTwo = ({ onNext, stepFields, setLoading }: StepTwoProps) => {
                 <InputDate
                     label="Fecha nacimiento"
                     name="fec_nacido"
+                    maximumDate={new Date()}
                     value={new Date()} />
             </View>
             <View style={globalStyles.inputGroup}>

@@ -10,13 +10,13 @@ export const appoinmentSchema = z.object({
     num_doc: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD),
     //step two
     pri_nombre: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)),
-    seg_nombre: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)).nullable(),
+    seg_nombre: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)).nullable().optional(),
     pri_apellido: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)),
-    seg_apellido: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)).nullable(),
+    seg_apellido: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)).nullable().optional(),
     sexo: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(1, MESSAGES.MAX_LENGTH(1)),
     fec_nacido: z.date(MESSAGES.DATE_INVALID),
     telefono_o: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)),
-    telefono_c: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)),
+    telefono_c: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD).max(30, MESSAGES.MAX_LENGTH(30)).nullable().optional(),
     email: z.email(MESSAGES.INVALID_EMAIL).min(1, MESSAGES.INVALID_EMAIL).max(100, MESSAGES.MAX_LENGTH(100)),
     auth_data: z.string(MESSAGES.REQUIRED_FIELD).min(1, MESSAGES.REQUIRED_FIELD),
     //step three
